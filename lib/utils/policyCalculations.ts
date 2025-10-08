@@ -111,7 +111,7 @@ export function formatIndianCurrency(amount: number): string {
  * Placeholder for future premium calculation
  * This will need actuarial tables which can be added later
  */
-export function estimatePremium(input: PolicyCalculationInput): number {
+export function estimatePremium(): number {
   // TODO: Implement actual premium calculation based on actuarial tables
   // For now, return 0 or estimated value
   return 0;
@@ -120,7 +120,7 @@ export function estimatePremium(input: PolicyCalculationInput): number {
 /**
  * Placeholder for maturity amount calculation
  */
-export function calculateMaturityAmount(input: PolicyCalculationInput): number {
+export function calculateMaturityAmount(): number {
   // TODO: Implement based on guaranteed additions, bonuses, etc.
   return 0;
 }

@@ -25,7 +25,7 @@ export interface FormData {
   premiumFrequency?: string; // "1" = Yearly, "2" = Half-yearly, "3" = Quarterly, "4" = Monthly
 
   // Additional fields (can be added as needed)
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface FormContextType {

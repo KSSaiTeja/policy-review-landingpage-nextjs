@@ -216,7 +216,7 @@ class PolicyDataService {
     const age = this.calculateAgeAtPurchase(dateOfBirth, purchaseDate);
     const reasons: string[] = [];
 
-    let eligiblePolicies = this.getEligiblePolicies({
+    const eligiblePolicies = this.getEligiblePolicies({
       purchaseDate,
       entryAge: age,
       planName,
