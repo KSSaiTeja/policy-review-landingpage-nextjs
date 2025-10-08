@@ -32,7 +32,7 @@ export default function Hero() {
             className="text-3xl md:text-5xl lg:text-6xl font-normal text-[#231f20] mb-6 leading-tight"
             style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}
             >
-              Is Your LIC Policy Really Growing <br className="hidden md:block" />Your Money?
+              Is Your LIC Policy Really Growing <br className="hidden md:block" />Your Money??
             </motion.h3>
 
             {/* Subheading */}
