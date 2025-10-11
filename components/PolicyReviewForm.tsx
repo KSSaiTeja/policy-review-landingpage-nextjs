@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { CalendarIcon, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useAgeAtPurchase, useAvailablePlansForUser } from "@/lib/hooks/usePolicyData";
 import { policyDataService } from "@/lib/services/PolicyDataService";
+import { SelectField, NumberField } from "@/components/form-fields/FormFieldComponents";
 import {
   Dialog,
   DialogContent,
@@ -56,9 +57,45 @@ const step3Schema = z.object({
   }),
 });
 
+// Form validation schema for Step 4 (Module-based fields)
+const step4Schema = z.object({
+  // Common fields across modules
+  basicSumAssured: z.string().optional(),
+  policyTerm: z.string().optional(),
+  premiumPayingTerm: z.string().optional(),
+  premiumAmount: z.string().optional(),
+  premiumFrequency: z.string().optional(),
+  
+  // Module 2 specific
+  survivalBenefitOption: z.string().optional(),
+  
+  // Module 3, 4, 7 specific
+  annuityAmount: z.string().optional(),
+  annuityFrequency: z.string().optional(),
+  
+  // Module 4 specific
+  planOption: z.string().optional(),
+  defermentPeriod: z.string().optional(),
+  
+  // Module 5 specific
+  premiumType: z.string().optional(),
+  
+  // Module 6 specific
+  benefitOption: z.string().optional(),
+  
+  // Module 8 specific
+  planOptionModule8: z.string().optional(),
+}).refine((data) => {
+  // Will add dynamic validation based on module later
+  return true;
+}, {
+  message: "Please fill all required fields",
+});
+
 type Step1FormValues = z.infer<typeof step1Schema>;
 type Step2FormValues = z.infer<typeof step2Schema>;
 type Step3FormValues = z.infer<typeof step3Schema>;
+type Step4FormValues = z.infer<typeof step4Schema>;
 
 interface PolicyReviewFormProps {
   open: boolean;
@@ -74,8 +111,9 @@ export default function PolicyReviewForm({
     step1?: Step1FormValues;
     step2?: Step2FormValues;
     step3?: Step3FormValues;
+    step4?: Step4FormValues;
   }>({});
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const step1Form = useForm<Step1FormValues>({
     resolver: zodResolver(step1Schema),
@@ -102,6 +140,13 @@ export default function PolicyReviewForm({
     },
   });
 
+  const step4Form = useForm<Step4FormValues>({
+    resolver: zodResolver(step4Schema),
+    mode: "onChange", // Instant validation
+    reValidateMode: "onChange",
+    defaultValues: {},
+  });
+
   function onStep1Submit(data: Step1FormValues) {
     console.log("Step 1 data:", data);
     setFormData((prev) => ({ ...prev, step1: data }));
@@ -120,12 +165,19 @@ export default function PolicyReviewForm({
     setCurrentStep(4);
   }
 
+  function onStep4Submit(data: Step4FormValues) {
+    console.log("Step 4 data:", data);
+    setFormData((prev) => ({ ...prev, step4: data }));
+    setCurrentStep(5);
+  }
+
   const resetForm = () => {
     setCurrentStep(1);
     setFormData({});
     step1Form.reset();
     step2Form.reset();
     step3Form.reset();
+    step4Form.reset();
   };
 
   const handleClose = () => {
@@ -144,6 +196,19 @@ export default function PolicyReviewForm({
     formData.step1?.dateOfBirth,
     formData.step2?.policyPurchaseDate
   );
+
+  // Get module for Step 4
+  const selectedPolicyModule = formData.step3?.selectedPolicy
+    ? policyDataService.getPoliciesByPlanName(formData.step3.selectedPolicy)[0]?.Module
+    : null;
+
+  // Frequency options
+  const frequencyOptions = [
+    { value: "1", label: "Monthly" },
+    { value: "2", label: "Quarterly" },
+    { value: "3", label: "Half-Yearly" },
+    { value: "4", label: "Yearly" },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -604,8 +669,527 @@ export default function PolicyReviewForm({
           </Form>
         )}
 
-        {/* Step 4: Review & Submit */}
-        {currentStep === 4 && (
+        {/* Step 4: Module-Specific Policy Details */}
+        {currentStep === 4 && selectedPolicyModule && (
+          <Form {...step4Form}>
+            <form onSubmit={step4Form.handleSubmit(onStep4Submit)} className="space-y-8">
+              {/* Form Content */}
+              <div className="px-8 py-6 space-y-6 bg-white">
+                {/* Section Title */}
+                <div className="pb-2">
+                  <h3 className="text-xl font-bold text-[#231f20] mb-1" style={{ fontFamily: "var(--font-quicksand), 'Quicksand', sans-serif" }}>
+                    Policy Details
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Please provide your policy information
+                  </p>
+                </div>
+
+                {/* Module Badge */}
+                <div className="flex items-center gap-2 bg-purple-50 border border-purple-100 rounded-lg p-3">
+                  <span className="text-sm text-purple-900 font-medium">Questions for:</span>
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-[#231f20] text-white">
+                    {selectedPolicyModule}
+                  </span>
+                </div>
+
+                {/* Form Fields - Module Specific */}
+                <div className="space-y-5">
+                  
+                  {/* MODULE 1 FIELDS */}
+                  {selectedPolicyModule === "Module 1" && (
+                    <>
+                      <NumberField
+                        control={step4Form.control}
+                        name="basicSumAssured"
+                        label="Basic Sum Assured"
+                        placeholder="Enter sum assured amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 2 FIELDS */}
+                  {selectedPolicyModule === "Module 2" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="survivalBenefitOption"
+                        label="Survival Benefit Option"
+                        placeholder="Select survival benefit option"
+                        options={[
+                          { value: "1", label: "Option 1: No survival benefit" },
+                          { value: "2", label: "Option 2: 5% of Sum Assured every year for 5 years" },
+                          { value: "3", label: "Option 3: 10% of Sum Assured every year for 5 years" },
+                          { value: "4", label: "Option 4: 15% of Sum Assured every year for 5 years" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="basicSumAssured"
+                        label="Basic Sum Assured"
+                        placeholder="Enter sum assured amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 3 FIELDS */}
+                  {selectedPolicyModule === "Module 3" && (
+                    <>
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="annuityAmount"
+                        label="Annuity Amount"
+                        placeholder="Enter annuity amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="annuityFrequency"
+                        label="Annuity Frequency"
+                        placeholder="Select annuity frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 4 FIELDS */}
+                  {selectedPolicyModule === "Module 4" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="planOption"
+                        label="Plan Option"
+                        placeholder="Select plan option"
+                        options={[
+                          { value: "1", label: "Option 1: Immediate Annuity" },
+                          { value: "2", label: "Option 2: Immediate Annuity with Return of Purchase Price (ROP)" },
+                          { value: "3", label: "Option 3: Immediate Annuity with Increasing Annuity" },
+                          { value: "4", label: "Option 4: Deferred Annuity" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      {/* Conditional: Only show if Deferred Annuity selected */}
+                      {step4Form.watch("planOption") === "4" && (
+                        <NumberField
+                          control={step4Form.control}
+                          name="defermentPeriod"
+                          label="Deferment Period"
+                          placeholder="Enter deferment period in years"
+                          errors={step4Form.formState.errors}
+                        />
+                      )}
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="annuityAmount"
+                        label="Annuity Amount"
+                        placeholder="Enter annuity amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="annuityFrequency"
+                        label="Annuity Frequency"
+                        placeholder="Select annuity frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 5 FIELDS */}
+                  {selectedPolicyModule === "Module 5" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumType"
+                        label="Premium Type"
+                        placeholder="Select premium type"
+                        options={[
+                          { value: "single", label: "Option 1: Single Premium" },
+                          { value: "limited", label: "Option 2: Limited Premium" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="basicSumAssured"
+                        label="Sum Assured"
+                        placeholder="Enter sum assured amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 6 FIELDS */}
+                  {selectedPolicyModule === "Module 6" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="benefitOption"
+                        label="Benefit Option"
+                        placeholder="Select benefit option"
+                        options={[
+                          { value: "1", label: "Option 1: 1.25 × Tabular Premium for the chosen Basic Sum Assured" },
+                          { value: "2", label: "Option 2: 10 × Tabular Premium for the chosen Basic Sum Assured" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="basicSumAssured"
+                        label="Sum Assured"
+                        placeholder="Enter sum assured amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 7 FIELDS */}
+                  {selectedPolicyModule === "Module 7" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="planOption"
+                        label="Plan Option"
+                        placeholder="Select plan option"
+                        options={[
+                          { value: "1", label: "Option 1: Immediate Annuity" },
+                          { value: "2", label: "Option 2: Immediate Annuity with Return of Purchase Price (ROP)" },
+                          { value: "3", label: "Option 3: Immediate Annuity with Increasing Annuity" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="annuityAmount"
+                        label="Annuity Amount"
+                        placeholder="Enter annuity amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="annuityFrequency"
+                        label="Annuity Frequency"
+                        placeholder="Select annuity frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                    </>
+                  )}
+
+                  {/* MODULE 8 FIELDS */}
+                  {selectedPolicyModule === "Module 8" && (
+                    <>
+                      <SelectField
+                        control={step4Form.control}
+                        name="planOptionModule8"
+                        label="Plan Option"
+                        placeholder="Select plan option"
+                        options={[
+                          { value: "1", label: "Option 1: Single Premium Option A - 10 times of Tabular Premium" },
+                          { value: "2", label: "Option 2: Single Premium Option B - 1.25 times of Tabular Premium" },
+                          { value: "3", label: "Option 3: Limited Premium Option 1 - Higher of 10x Tabular Premium or Guaranteed Sum Assured" },
+                          { value: "4", label: "Option 4: Limited Premium Option 2 - Higher of 7x Tabular Premium or Guaranteed Sum Assured" },
+                        ]}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="basicSumAssured"
+                        label="Basic Sum Assured"
+                        placeholder="Enter sum assured amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="policyTerm"
+                        label="Policy Term"
+                        placeholder="Enter policy term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumPayingTerm"
+                        label="Premium Paying Term"
+                        placeholder="Enter premium paying term in years"
+                        errors={step4Form.formState.errors}
+                      />
+                      <SelectField
+                        control={step4Form.control}
+                        name="premiumFrequency"
+                        label="Premium Payment Frequency"
+                        placeholder="Select payment frequency"
+                        options={frequencyOptions}
+                        errors={step4Form.formState.errors}
+                      />
+                      <NumberField
+                        control={step4Form.control}
+                        name="premiumAmount"
+                        label="Premium Amount"
+                        placeholder="Enter premium amount"
+                        errors={step4Form.formState.errors}
+                        prefix="₹"
+                      />
+                    </>
+                  )}
+                </div>
+
+                {/* Helper Text */}
+                <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mt-6">
+                  <p className="text-sm text-blue-900 flex items-start gap-2">
+                    <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                    </svg>
+                    <span>These details will be used to calculate your policy returns and maturity benefits accurately.</span>
+                  </p>
+                </div>
+              </div>
+
+              {/* Form Actions */}
+              <div className="flex justify-between gap-3 px-8 py-6 bg-gray-50 border-t border-gray-100">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setCurrentStep(3)}
+                  className="h-12 px-6 border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 rounded-lg transition-all duration-200 font-semibold"
+                >
+                  ← Back
+                </Button>
+                <Button
+                  type="submit"
+                  className="h-12 px-8 bg-[#231f20] text-white hover:bg-[#3a3a3a] rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+                >
+                  Continue to Review →
+                </Button>
+              </div>
+            </form>
+          </Form>
+        )}
+
+        {/* Step 5: Review & Submit */}
+        {currentStep === 5 && (
           <div className="space-y-0">
             <div className="px-8 py-6 bg-white">
               <div className="max-w-md mx-auto">
@@ -666,7 +1250,7 @@ export default function PolicyReviewForm({
             <div className="flex justify-between gap-3 px-8 py-6 bg-gray-50 border-t border-gray-100">
               <Button
                 variant="outline"
-                onClick={() => setCurrentStep(3)}
+                onClick={() => setCurrentStep(4)}
                 className="h-12 px-6 border-2 border-gray-300 hover:bg-gray-100 hover:border-gray-400 rounded-lg transition-all duration-200 font-semibold"
               >
                 ← Back
