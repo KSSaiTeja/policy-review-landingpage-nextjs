@@ -5,7 +5,7 @@
  * All calculation logic should be here for easy testing
  */
 
-import { PolicyData, PolicyCalculationInput } from "@/types/policy";
+import { PolicyData } from "@/types/policy";
 import { differenceInYears, addYears } from "date-fns";
 
 /**

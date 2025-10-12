@@ -85,12 +85,12 @@ const step4Schema = z.object({
   
   // Module 8 specific
   planOptionModule8: z.string().optional(),
-}).refine((data) => {
-  // Will add dynamic validation based on module later
-  return true;
-}, {
-  message: "Please fill all required fields",
-});
+  }).refine(() => {
+    // Will add dynamic validation based on module later
+    return true;
+  }, {
+    message: "Please fill all required fields",
+  });
 
 type Step1FormValues = z.infer<typeof step1Schema>;
 type Step2FormValues = z.infer<typeof step2Schema>;
@@ -319,18 +319,23 @@ export default function PolicyReviewForm({
 
   const pptOptions = getPPTOptions();
 
-  // Validate Sum Assured
+  // Validate Sum Assured (Rule 1: Between Min/Max and in Multiples)
   const validateSumAssured = (value: string) => {
     if (!selectedPolicyData || !value) return true;
 
     const amount = parseInt(value, 10);
     
-    // Check minimum
+    // Check minimum limit
     if (selectedPolicyData.MinSumAssured && amount < selectedPolicyData.MinSumAssured) {
       return `Minimum sum assured is ₹${selectedPolicyData.MinSumAssured.toLocaleString("en-IN")}`;
     }
 
-    // Check multiples
+    // Check maximum limit (if specified, otherwise no limit)
+    if (selectedPolicyData.MaxSumAssured && selectedPolicyData.MaxSumAssured !== "No Limit" && amount > parseInt(selectedPolicyData.MaxSumAssured.toString(), 10)) {
+      return `Maximum sum assured is ₹${parseInt(selectedPolicyData.MaxSumAssured.toString(), 10).toLocaleString("en-IN")}`;
+    }
+
+    // Check multiples (e.g., must be multiple of 5000)
     if (selectedPolicyData.SumAssuredMultiples && amount % selectedPolicyData.SumAssuredMultiples !== 0) {
       return `Sum assured must be in multiples of ₹${selectedPolicyData.SumAssuredMultiples.toLocaleString("en-IN")}`;
     }
@@ -848,6 +853,28 @@ export default function PolicyReviewForm({
                         options={policyTermOptions}
                         errors={step4Form.formState.errors}
                       />
+                      
+                      {/* Age-Linked Policy Warning */}
+                      {isAgeLinkedPolicy && currentAgeAtPurchase !== null && step4Form.watch("policyTerm") && (() => {
+                        const selectedTerm = parseInt(step4Form.watch("policyTerm") || "0", 10);
+                        const actualTerm = selectedTerm - currentAgeAtPurchase;
+                        return (
+                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                            <div className="flex items-start gap-2">
+                              <span className="text-orange-600 font-bold text-lg">⚠️</span>
+                              <div className="flex-1">
+                                <h5 className="text-sm font-semibold text-orange-800 mb-1">Special Policy Term Calculation</h5>
+                                <p className="text-xs text-orange-700">
+                                  For this policy, the actual policy term will be: <strong>{selectedTerm} - {currentAgeAtPurchase} = {actualTerm} years</strong>
+                                </p>
+                                <p className="text-xs text-orange-600 mt-1">
+                                  (Selected Policy Term - Your Current Age = Actual Policy Term)
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
                       
                       {/* Premium Paying Term - Dropdown based on PPT logic */}
                       {pptOptions.length > 0 && (

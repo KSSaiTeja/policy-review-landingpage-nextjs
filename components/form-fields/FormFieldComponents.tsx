@@ -15,7 +15,7 @@ interface SelectFieldProps<T extends FieldValues> {
   label: string;
   placeholder: string;
   options: { value: string; label: string }[];
-  errors: any;
+  errors: Record<string, { message?: string } | undefined>;
   required?: boolean;
 }
 
@@ -92,7 +92,7 @@ interface NumberFieldProps<T extends FieldValues> {
   name: Path<T>;
   label: string;
   placeholder: string;
-  errors: any;
+  errors: Record<string, { message?: string } | undefined>;
   required?: boolean;
   prefix?: string;
   helperText?: string;
