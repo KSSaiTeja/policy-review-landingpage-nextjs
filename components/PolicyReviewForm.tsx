@@ -144,7 +144,21 @@ export default function PolicyReviewForm({
     resolver: zodResolver(step4Schema),
     mode: "onChange", // Instant validation
     reValidateMode: "onChange",
-    defaultValues: {},
+    defaultValues: {
+      basicSumAssured: "",
+      policyTerm: "",
+      premiumPayingTerm: "",
+      premiumAmount: "",
+      premiumFrequency: "",
+      survivalBenefitOption: "",
+      annuityAmount: "",
+      annuityFrequency: "",
+      planOption: "",
+      defermentPeriod: "",
+      premiumType: "",
+      benefitOption: "",
+      planOptionModule8: "",
+    },
   });
 
   function onStep1Submit(data: Step1FormValues) {
@@ -197,9 +211,20 @@ export default function PolicyReviewForm({
     formData.step2?.policyPurchaseDate
   );
 
-  // Get module for Step 4
-  const selectedPolicyModule = formData.step3?.selectedPolicy
-    ? policyDataService.getPoliciesByPlanName(formData.step3.selectedPolicy)[0]?.Module
+  // Get module and selected policy data for Step 4
+  const selectedPolicyData = formData.step3?.selectedPolicy && formData.step2?.policyPurchaseDate && formData.step1?.dateOfBirth
+    ? policyDataService.findBestMatchingPolicy(
+        formData.step1.dateOfBirth,
+        formData.step2.policyPurchaseDate,
+        formData.step3.selectedPolicy
+      ).policy
+    : null;
+
+  const selectedPolicyModule = selectedPolicyData?.Module || null;
+
+  // Calculate current age for maturity calculations
+  const currentAgeAtPurchase = formData.step1?.dateOfBirth && formData.step2?.policyPurchaseDate
+    ? policyDataService.calculateAgeAtPurchase(formData.step1.dateOfBirth, formData.step2.policyPurchaseDate)
     : null;
 
   // Frequency options
@@ -209,6 +234,109 @@ export default function PolicyReviewForm({
     { value: "3", label: "Half-Yearly" },
     { value: "4", label: "Yearly" },
   ];
+
+  // Special UINs where Policy Term is linked to age
+  const ageLinkedPolicyUINs = ["512N296V02", "512N312V01", "512N312V02", "512N338V01", "512N363V01"];
+  const isAgeLinkedPolicy = selectedPolicyData ? ageLinkedPolicyUINs.includes(selectedPolicyData.UIN) : false;
+
+  // Check if Single Premium (PPT = "1")
+  const isSinglePremium = selectedPolicyData?.PPT === "1";
+
+  // Calculate valid policy term range for Module 1
+  const calculateValidPolicyTermRange = () => {
+    if (!selectedPolicyData || currentAgeAtPurchase === null) return null;
+
+    let minTerm = selectedPolicyData.MinPolicyTerm;
+    let maxTerm = selectedPolicyData.MaxPolicyTerm;
+
+    // Apply Age at Maturity Rule
+    if (selectedPolicyData.MinAgeAtMaturity) {
+      const minTermFromAge = selectedPolicyData.MinAgeAtMaturity - currentAgeAtPurchase;
+      minTerm = Math.max(minTerm, minTermFromAge);
+    }
+
+    if (selectedPolicyData.MaxAgeAtMaturity) {
+      const maxTermFromAge = selectedPolicyData.MaxAgeAtMaturity - currentAgeAtPurchase;
+      maxTerm = Math.min(maxTerm, maxTermFromAge);
+    }
+
+    return { min: Math.max(0, minTerm), max: maxTerm };
+  };
+
+  const validPolicyTermRange = calculateValidPolicyTermRange();
+
+  // Get policy term options for dropdown
+  const getPolicyTermOptions = () => {
+    if (!validPolicyTermRange) return [];
+    
+    const options = [];
+    for (let term = validPolicyTermRange.min; term <= validPolicyTermRange.max; term++) {
+      options.push({ 
+        value: term.toString(), 
+        label: `${term} ${term === 1 ? 'year' : 'years'}` 
+      });
+    }
+    return options;
+  };
+
+  const policyTermOptions = getPolicyTermOptions();
+
+  // Get PPT options based on policy PPT value
+  const getPPTOptions = () => {
+    if (!selectedPolicyData) return [];
+
+    const pptValue = selectedPolicyData.PPT.trim();
+    const policyTerm = parseInt(step4Form.watch("policyTerm") || "0", 10);
+
+    // PPT = "1" - Single Premium
+    if (pptValue === "1") {
+      return [{ value: "1", label: "1 year (Single Premium)" }];
+    }
+
+    // PPT = "0" - Regular Premium (same as policy term)
+    if (pptValue === "0") {
+      return policyTerm > 0 ? [{ value: policyTerm.toString(), label: `${policyTerm} years (Same as Policy Term)` }] : [];
+    }
+
+    // PPT is comma-separated list (e.g., "5,10,15")
+    if (pptValue.includes(",")) {
+      return pptValue.split(",").map(p => ({
+        value: p.trim(),
+        label: `${p.trim()} years`
+      }));
+    }
+
+    // PPT is negative (e.g., "-5") - Policy Term minus value
+    if (pptValue.startsWith("-")) {
+      const subtract = parseInt(pptValue.substring(1), 10);
+      const calculatedPPT = policyTerm > subtract ? policyTerm - subtract : 0;
+      return calculatedPPT > 0 ? [{ value: calculatedPPT.toString(), label: `${calculatedPPT} years (Policy Term - ${subtract})` }] : [];
+    }
+
+    // PPT is fixed positive number
+    return [{ value: pptValue, label: `${pptValue} years` }];
+  };
+
+  const pptOptions = getPPTOptions();
+
+  // Validate Sum Assured
+  const validateSumAssured = (value: string) => {
+    if (!selectedPolicyData || !value) return true;
+
+    const amount = parseInt(value, 10);
+    
+    // Check minimum
+    if (selectedPolicyData.MinSumAssured && amount < selectedPolicyData.MinSumAssured) {
+      return `Minimum sum assured is ₹${selectedPolicyData.MinSumAssured.toLocaleString("en-IN")}`;
+    }
+
+    // Check multiples
+    if (selectedPolicyData.SumAssuredMultiples && amount % selectedPolicyData.SumAssuredMultiples !== 0) {
+      return `Sum assured must be in multiples of ₹${selectedPolicyData.SumAssuredMultiples.toLocaleString("en-IN")}`;
+    }
+
+    return true;
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
@@ -706,21 +834,33 @@ export default function PolicyReviewForm({
                         placeholder="Enter sum assured amount"
                         errors={step4Form.formState.errors}
                         prefix="₹"
+                        customValidation={validateSumAssured}
+                        helperText={selectedPolicyData?.SumAssuredMultiples 
+                          ? `Must be in multiples of ₹${selectedPolicyData.SumAssuredMultiples.toLocaleString("en-IN")}`
+                          : undefined
+                        }
                       />
-                      <NumberField
+                      <SelectField
                         control={step4Form.control}
                         name="policyTerm"
                         label="Policy Term"
-                        placeholder="Enter policy term in years"
+                        placeholder="Select policy term"
+                        options={policyTermOptions}
                         errors={step4Form.formState.errors}
                       />
-                      <NumberField
-                        control={step4Form.control}
-                        name="premiumPayingTerm"
-                        label="Premium Paying Term"
-                        placeholder="Enter premium paying term in years"
-                        errors={step4Form.formState.errors}
-                      />
+                      
+                      {/* Premium Paying Term - Dropdown based on PPT logic */}
+                      {pptOptions.length > 0 && (
+                        <SelectField
+                          control={step4Form.control}
+                          name="premiumPayingTerm"
+                          label="Premium Paying Term"
+                          placeholder="Select premium paying term"
+                          options={pptOptions}
+                          errors={step4Form.formState.errors}
+                        />
+                      )}
+
                       <NumberField
                         control={step4Form.control}
                         name="premiumAmount"
@@ -729,14 +869,18 @@ export default function PolicyReviewForm({
                         errors={step4Form.formState.errors}
                         prefix="₹"
                       />
-                      <SelectField
-                        control={step4Form.control}
-                        name="premiumFrequency"
-                        label="Premium Payment Frequency"
-                        placeholder="Select payment frequency"
-                        options={frequencyOptions}
-                        errors={step4Form.formState.errors}
-                      />
+                      
+                      {/* Only show Premium Frequency if NOT Single Premium */}
+                      {!isSinglePremium && (
+                        <SelectField
+                          control={step4Form.control}
+                          name="premiumFrequency"
+                          label="Premium Payment Frequency"
+                          placeholder="Select payment frequency"
+                          options={frequencyOptions}
+                          errors={step4Form.formState.errors}
+                        />
+                      )}
                     </>
                   )}
 
