@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -211,8 +211,13 @@ export default function PolicyReviewForm({
     formData.step2?.policyPurchaseDate
   );
 
-  // Get module and selected policy data for Step 4
-  const selectedPolicyData = formData.step3?.selectedPolicy && formData.step2?.policyPurchaseDate && formData.step1?.dateOfBirth
+  // Calculate current age for maturity calculations
+  const currentAgeAtPurchase = formData.step1?.dateOfBirth && formData.step2?.policyPurchaseDate
+    ? policyDataService.calculateAgeAtPurchase(formData.step1.dateOfBirth, formData.step2.policyPurchaseDate)
+    : null;
+
+  // Get initial policy data for module detection (uses any variant since module is same)
+  const initialPolicyData = formData.step3?.selectedPolicy && formData.step2?.policyPurchaseDate && formData.step1?.dateOfBirth
     ? policyDataService.findBestMatchingPolicy(
         formData.step1.dateOfBirth,
         formData.step2.policyPurchaseDate,
@@ -220,12 +225,73 @@ export default function PolicyReviewForm({
       ).policy
     : null;
 
-  const selectedPolicyModule = selectedPolicyData?.Module || null;
+  const selectedPolicyModule = initialPolicyData?.Module || null;
 
-  // Calculate current age for maturity calculations
-  const currentAgeAtPurchase = formData.step1?.dateOfBirth && formData.step2?.policyPurchaseDate
-    ? policyDataService.calculateAgeAtPurchase(formData.step1.dateOfBirth, formData.step2.policyPurchaseDate)
-    : null;
+  // Get policy term options based on ALL eligible variants
+  const policyTermOptions = useMemo(() => {
+    if (!formData.step3?.selectedPolicy || !currentAgeAtPurchase || !formData.step2?.policyPurchaseDate) {
+      return [];
+    }
+
+    const selectedPolicy = formData.step3.selectedPolicy;
+    const purchaseDate = formData.step2.policyPurchaseDate;
+
+    const validTerms = policyDataService.getValidPolicyTermOptions(
+      selectedPolicy,
+      currentAgeAtPurchase,
+      purchaseDate
+    );
+
+    // Apply Age at Maturity Rule for each term
+    const filteredTerms = validTerms.filter(term => {
+      // Get the variant for this specific term
+      const variant = policyDataService.selectVariantByPolicyTerm(
+        selectedPolicy,
+        term,
+        currentAgeAtPurchase,
+        purchaseDate
+      );
+
+      if (!variant) return false;
+
+      // Check min maturity age
+      if (variant.MinAgeAtMaturity) {
+        const ageAtMaturity = currentAgeAtPurchase + term;
+        if (ageAtMaturity < variant.MinAgeAtMaturity) return false;
+      }
+
+      // Check max maturity age
+      if (variant.MaxAgeAtMaturity) {
+        const ageAtMaturity = currentAgeAtPurchase + term;
+        if (ageAtMaturity > variant.MaxAgeAtMaturity) return false;
+      }
+
+      return true;
+    });
+
+    return filteredTerms.map(term => ({
+      value: term.toString(),
+      label: `${term} ${term === 1 ? 'year' : 'years'}`
+    }));
+  }, [formData.step3?.selectedPolicy, formData.step2?.policyPurchaseDate, currentAgeAtPurchase]);
+
+  // Get the CORRECT variant based on selected policy term
+  const selectedPolicyData = useMemo(() => {
+    const selectedTerm = step4Form.watch("policyTerm");
+    
+    if (!formData.step3?.selectedPolicy || !selectedTerm || !currentAgeAtPurchase || !formData.step2?.policyPurchaseDate) {
+      return initialPolicyData; // Fallback to initial data if term not selected yet
+    }
+
+    const variant = policyDataService.selectVariantByPolicyTerm(
+      formData.step3.selectedPolicy,
+      parseInt(selectedTerm, 10),
+      currentAgeAtPurchase,
+      formData.step2.policyPurchaseDate
+    );
+
+    return variant || initialPolicyData;
+  }, [formData.step3?.selectedPolicy, formData.step2?.policyPurchaseDate, currentAgeAtPurchase, step4Form.watch("policyTerm"), initialPolicyData]);
 
   // Frequency options
   const frequencyOptions = [
@@ -242,47 +308,8 @@ export default function PolicyReviewForm({
   // Check if Single Premium (PPT = "1")
   const isSinglePremium = selectedPolicyData?.PPT === "1";
 
-  // Calculate valid policy term range for Module 1
-  const calculateValidPolicyTermRange = () => {
-    if (!selectedPolicyData || currentAgeAtPurchase === null) return null;
-
-    let minTerm = selectedPolicyData.MinPolicyTerm;
-    let maxTerm = selectedPolicyData.MaxPolicyTerm;
-
-    // Apply Age at Maturity Rule
-    if (selectedPolicyData.MinAgeAtMaturity) {
-      const minTermFromAge = selectedPolicyData.MinAgeAtMaturity - currentAgeAtPurchase;
-      minTerm = Math.max(minTerm, minTermFromAge);
-    }
-
-    if (selectedPolicyData.MaxAgeAtMaturity) {
-      const maxTermFromAge = selectedPolicyData.MaxAgeAtMaturity - currentAgeAtPurchase;
-      maxTerm = Math.min(maxTerm, maxTermFromAge);
-    }
-
-    return { min: Math.max(0, minTerm), max: maxTerm };
-  };
-
-  const validPolicyTermRange = calculateValidPolicyTermRange();
-
-  // Get policy term options for dropdown
-  const getPolicyTermOptions = () => {
-    if (!validPolicyTermRange) return [];
-    
-    const options = [];
-    for (let term = validPolicyTermRange.min; term <= validPolicyTermRange.max; term++) {
-      options.push({ 
-        value: term.toString(), 
-        label: `${term} ${term === 1 ? 'year' : 'years'}` 
-      });
-    }
-    return options;
-  };
-
-  const policyTermOptions = getPolicyTermOptions();
-
-  // Get PPT options based on policy PPT value
-  const getPPTOptions = () => {
+  // Get PPT options based on policy PPT value (reactive to variant changes)
+  const pptOptions = useMemo(() => {
     if (!selectedPolicyData) return [];
 
     const pptValue = selectedPolicyData.PPT.trim();
@@ -315,9 +342,7 @@ export default function PolicyReviewForm({
 
     // PPT is fixed positive number
     return [{ value: pptValue, label: `${pptValue} years` }];
-  };
-
-  const pptOptions = getPPTOptions();
+  }, [selectedPolicyData, step4Form.watch("policyTerm")]);
 
   // Validate Sum Assured (Rule 1: Between Min/Max and in Multiples)
   const validateSumAssured = (value: string) => {

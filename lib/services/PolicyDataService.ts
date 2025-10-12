@@ -284,6 +284,98 @@ class PolicyDataService {
   }
 
   /**
+   * Get all valid policy term options for a user based on their age and purchase date
+   * This handles policies with multiple variants (different terms)
+   */
+  getValidPolicyTermOptions(
+    planName: string,
+    ageAtPurchase: number,
+    purchaseDate: Date
+  ): number[] {
+    const allVariants = this.getPoliciesByPlanName(planName);
+    
+    // Filter variants that match the user's age and purchase date
+    const eligibleVariants = allVariants.filter(variant => {
+      // Check age eligibility
+      const minAge = this.parseAge(variant.MinEntryAge);
+      const maxAge = this.parseAge(variant.MaxEntryAge);
+      
+      if (ageAtPurchase < minAge || ageAtPurchase > maxAge) {
+        return false;
+      }
+      
+      // Check date eligibility
+      if (!this.isPolicyActiveOnDate(variant, purchaseDate)) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    // Extract unique policy terms from eligible variants
+    const policyTerms = new Set<number>();
+    
+    eligibleVariants.forEach(variant => {
+      // Add both min and max if they form a range
+      if (variant.MinPolicyTerm === variant.MaxPolicyTerm) {
+        // Fixed term policy
+        policyTerms.add(variant.MinPolicyTerm);
+      } else {
+        // Range policy - add all terms in range
+        for (let term = variant.MinPolicyTerm; term <= variant.MaxPolicyTerm; term++) {
+          policyTerms.add(term);
+        }
+      }
+    });
+    
+    // Convert to sorted array
+    return Array.from(policyTerms).sort((a, b) => a - b);
+  }
+
+  /**
+   * Select the correct policy variant based on policy term, age, and purchase date
+   * This ensures we use the right variant's constraints for validations
+   */
+  selectVariantByPolicyTerm(
+    planName: string,
+    policyTerm: number,
+    ageAtPurchase: number,
+    purchaseDate: Date
+  ): PolicyData | null {
+    const allVariants = this.getPoliciesByPlanName(planName);
+    
+    // Find variant that matches ALL criteria:
+    // 1. Policy term matches (either exact or within range)
+    // 2. User's age is within variant's age limits
+    // 3. Purchase date is within variant's active period
+    
+    const matchingVariant = allVariants.find(variant => {
+      // Check if policy term matches
+      const termMatches = policyTerm >= variant.MinPolicyTerm && 
+                         policyTerm <= variant.MaxPolicyTerm;
+      
+      if (!termMatches) return false;
+      
+      // Check age eligibility
+      const minAge = this.parseAge(variant.MinEntryAge);
+      const maxAge = this.parseAge(variant.MaxEntryAge);
+      
+      if (ageAtPurchase < minAge || ageAtPurchase > maxAge) {
+        return false;
+      }
+      
+      // Check date eligibility
+      if (!this.isPolicyActiveOnDate(variant, purchaseDate)) {
+        return false;
+      }
+      
+      return true;
+    });
+    
+    return matchingVariant || null;
+  }
+
+  /**
    * Validate if sum assured is within policy limits
    */
   validateSumAssured(policy: PolicyData, sumAssured: number): {
