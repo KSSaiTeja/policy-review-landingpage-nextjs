@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,6 +9,7 @@ import { CalendarIcon, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useAgeAtPurchase, useAvailablePlansForUser } from "@/lib/hooks/usePolicyData";
 import { policyDataService } from "@/lib/services/PolicyDataService";
 import { SelectField, NumberField } from "@/components/form-fields/FormFieldComponents";
+import PolicyReviewOutput from "@/components/PolicyReviewOutput";
 import {
   Dialog,
   DialogContent,
@@ -113,7 +114,7 @@ export default function PolicyReviewForm({
     step3?: Step3FormValues;
     step4?: Step4FormValues;
   }>({});
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const step1Form = useForm<Step1FormValues>({
     resolver: zodResolver(step1Schema),
@@ -236,40 +237,14 @@ export default function PolicyReviewForm({
     const selectedPolicy = formData.step3.selectedPolicy;
     const purchaseDate = formData.step2.policyPurchaseDate;
 
+    // Get valid terms (service handles age-linked vs regular policies)
     const validTerms = policyDataService.getValidPolicyTermOptions(
       selectedPolicy,
       currentAgeAtPurchase,
       purchaseDate
     );
 
-    // Apply Age at Maturity Rule for each term
-    const filteredTerms = validTerms.filter(term => {
-      // Get the variant for this specific term
-      const variant = policyDataService.selectVariantByPolicyTerm(
-        selectedPolicy,
-        term,
-        currentAgeAtPurchase,
-        purchaseDate
-      );
-
-      if (!variant) return false;
-
-      // Check min maturity age
-      if (variant.MinAgeAtMaturity) {
-        const ageAtMaturity = currentAgeAtPurchase + term;
-        if (ageAtMaturity < variant.MinAgeAtMaturity) return false;
-      }
-
-      // Check max maturity age
-      if (variant.MaxAgeAtMaturity) {
-        const ageAtMaturity = currentAgeAtPurchase + term;
-        if (ageAtMaturity > variant.MaxAgeAtMaturity) return false;
-      }
-
-      return true;
-    });
-
-    return filteredTerms.map(term => ({
+    return validTerms.map(term => ({
       value: term.toString(),
       label: `${term} ${term === 1 ? 'year' : 'years'}`
     }));
@@ -293,6 +268,35 @@ export default function PolicyReviewForm({
     return variant || initialPolicyData;
   }, [formData.step3?.selectedPolicy, formData.step2?.policyPurchaseDate, currentAgeAtPurchase, step4Form.watch("policyTerm"), initialPolicyData]);
 
+  // Reset dependent fields when policy term changes
+  const previousPolicyTerm = useRef<string>("");
+  const previousSelectedPolicy = useRef<string>("");
+  const currentPolicyTerm = step4Form.watch("policyTerm");
+  const currentSelectedPolicy = formData.step3?.selectedPolicy || "";
+  
+  useEffect(() => {
+    if (previousPolicyTerm.current !== currentPolicyTerm && currentPolicyTerm) {
+      // Reset dependent fields when policy term changes
+      step4Form.setValue("premiumPayingTerm", "");
+      step4Form.setValue("premiumAmount", "");
+      step4Form.setValue("premiumFrequency", "");
+      previousPolicyTerm.current = currentPolicyTerm;
+    }
+  }, [currentPolicyTerm, step4Form]);
+
+  useEffect(() => {
+    if (previousSelectedPolicy.current !== currentSelectedPolicy && currentSelectedPolicy) {
+      // Reset all Step 4 fields when policy selection changes
+      step4Form.setValue("policyTerm", "");
+      step4Form.setValue("premiumPayingTerm", "");
+      step4Form.setValue("premiumAmount", "");
+      step4Form.setValue("premiumFrequency", "");
+      step4Form.setValue("basicSumAssured", "");
+      previousSelectedPolicy.current = currentSelectedPolicy;
+      previousPolicyTerm.current = "";
+    }
+  }, [currentSelectedPolicy, step4Form]);
+
   // Frequency options
   const frequencyOptions = [
     { value: "1", label: "Monthly" },
@@ -301,9 +305,6 @@ export default function PolicyReviewForm({
     { value: "4", label: "Yearly" },
   ];
 
-  // Special UINs where Policy Term is linked to age
-  const ageLinkedPolicyUINs = ["512N296V02", "512N312V01", "512N312V02", "512N338V01", "512N363V01"];
-  const isAgeLinkedPolicy = selectedPolicyData ? ageLinkedPolicyUINs.includes(selectedPolicyData.UIN) : false;
 
   // Check if Single Premium (PPT = "1")
   const isSinglePremium = selectedPolicyData?.PPT === "1";
@@ -370,36 +371,41 @@ export default function PolicyReviewForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0">
-        {/* Header Section - Law of Common Region */}
-        <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
-          <DialogHeader>
-            <DialogTitle className="text-3xl font-bold text-[#231f20] mb-3" style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}>
-              Get Your Free Policy Review
-            </DialogTitle>
-            <DialogDescription className="text-base text-gray-600">
-              Let&apos;s analyze your LIC policy and show you the real returns.
-            </DialogDescription>
-          </DialogHeader>
+      <DialogContent className={cn(
+        "max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0",
+        currentStep === 6 ? "sm:max-w-[95vw] w-[95vw]" : "sm:max-w-[600px]"
+      )}>
+        {/* Header Section - Law of Common Region (Hidden on Step 6) */}
+        {currentStep !== 6 && (
+          <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
+            <DialogHeader>
+              <DialogTitle className="text-3xl font-bold text-[#231f20] mb-3" style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}>
+                Get Your Free Policy Review
+              </DialogTitle>
+              <DialogDescription className="text-base text-gray-600">
+                Let&apos;s analyze your LIC policy and show you the real returns.
+              </DialogDescription>
+            </DialogHeader>
 
-          {/* Progress Indicator - Visual Feedback (Doherty Threshold) */}
-          <div className="mt-6">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-sm font-semibold text-[#231f20]">
-                Step {currentStep} of {totalSteps}
-              </span>
-              <span className="text-sm font-medium text-gray-500">
-                {Math.round((currentStep / totalSteps) * 100)}% Complete
-              </span>
-            </div>
-            <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-              <div
-                className="bg-gradient-to-r from-[#231f20] to-[#3a3a3a] h-2.5 rounded-full transition-all duration-500 ease-out"
-                style={{ width: `${(currentStep / totalSteps) * 100}%` }}
-              />
+            {/* Progress Indicator - Visual Feedback (Doherty Threshold) */}
+            <div className="mt-6">
+              <div className="flex justify-between items-center mb-3">
+                <span className="text-sm font-semibold text-[#231f20]">
+                  Step {currentStep} of {totalSteps}
+                </span>
+                <span className="text-sm font-medium text-gray-500">
+                  {Math.round((currentStep / totalSteps) * 100)}% Complete
+                </span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-[#231f20] to-[#3a3a3a] h-2.5 rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${(currentStep / totalSteps) * 100}%` }}
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Step 1: Personal Information - Law of Proximity & Common Region */}
         {currentStep === 1 && (
@@ -880,26 +886,6 @@ export default function PolicyReviewForm({
                       />
                       
                       {/* Age-Linked Policy Warning */}
-                      {isAgeLinkedPolicy && currentAgeAtPurchase !== null && step4Form.watch("policyTerm") && (() => {
-                        const selectedTerm = parseInt(step4Form.watch("policyTerm") || "0", 10);
-                        const actualTerm = selectedTerm - currentAgeAtPurchase;
-                        return (
-                          <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                            <div className="flex items-start gap-2">
-                              <span className="text-orange-600 font-bold text-lg">⚠️</span>
-                              <div className="flex-1">
-                                <h5 className="text-sm font-semibold text-orange-800 mb-1">Special Policy Term Calculation</h5>
-                                <p className="text-xs text-orange-700">
-                                  For this policy, the actual policy term will be: <strong>{selectedTerm} - {currentAgeAtPurchase} = {actualTerm} years</strong>
-                                </p>
-                                <p className="text-xs text-orange-600 mt-1">
-                                  (Selected Policy Term - Your Current Age = Actual Policy Term)
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })()}
                       
                       {/* Premium Paying Term - Dropdown based on PPT logic */}
                       {pptOptions.length > 0 && (
@@ -1454,14 +1440,21 @@ export default function PolicyReviewForm({
               <Button
                 onClick={() => {
                   console.log("Final form data:", formData);
-                  // TODO: Submit to API
-                  handleClose();
+                  // Move to Step 6 to show the output report
+                  setCurrentStep(6);
                 }}
                 className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
               >
-                Submit Review Request
+                Generate Policy Review Report
               </Button>
             </div>
+          </div>
+        )}
+
+        {/* Step 6: Policy Review Output - Full Report */}
+        {currentStep === 6 && (
+          <div className="p-0">
+            <PolicyReviewOutput formData={formData} onClose={handleClose} />
           </div>
         )}
       </DialogContent>

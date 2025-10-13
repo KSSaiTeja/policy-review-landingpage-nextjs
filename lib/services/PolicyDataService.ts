@@ -131,6 +131,32 @@ class PolicyDataService {
   }
 
   /**
+   * Parse policy term value (handles days vs years)
+   * For regular policies: MinPolicyTerm: 90 means 90 days (0.25 years) if < 10, otherwise years
+   * For age-linked policies: We don't use MinPolicyTerm/MaxPolicyTerm, we use MinAgeAtMaturity/MaxAgeAtMaturity
+   */
+  private parsePolicyTerm(term: number | string): number {
+    if (typeof term === "number") {
+      // For regular policies, if term is very small (like 90), it likely means days
+      if (term < 10) {
+        return term / 365; // Convert days to years
+      }
+      return term; // Already in years
+    }
+    if (typeof term === "string") {
+      const lowerTerm = term.toLowerCase();
+      if (lowerTerm.includes("day")) {
+        const daysMatch = term.match(/\d+/);
+        const days = daysMatch ? parseInt(daysMatch[0], 10) : 90;
+        return days / 365; // Convert days to years
+      }
+      const numMatch = term.match(/\d+/);
+      return numMatch ? parseInt(numMatch[0], 10) : 0;
+    }
+    return 0;
+  }
+
+  /**
    * Check if age is within policy entry age range
    */
   isAgeEligible(policy: PolicyData, age: number): boolean {
@@ -312,21 +338,67 @@ class PolicyDataService {
       return true;
     });
     
+    if (eligibleVariants.length === 0) return [];
+
+    // Check if this is an age-linked policy
+    const isAgeLinked = ["512N296V02", "512N312V01", "512N312V02"]
+      .includes(eligibleVariants[0].UIN);
+
     // Extract unique policy terms from eligible variants
     const policyTerms = new Set<number>();
     
-    eligibleVariants.forEach(variant => {
-      // Add both min and max if they form a range
-      if (variant.MinPolicyTerm === variant.MaxPolicyTerm) {
-        // Fixed term policy
-        policyTerms.add(variant.MinPolicyTerm);
-      } else {
-        // Range policy - add all terms in range
-        for (let term = variant.MinPolicyTerm; term <= variant.MaxPolicyTerm; term++) {
-          policyTerms.add(term);
+    if (isAgeLinked) {
+      // For age-linked policies: calculate actual policy terms from target ages
+      // Generate actual terms from MinAgeAtMaturity to MaxAgeAtMaturity
+      eligibleVariants.forEach(variant => {
+        if (variant.MinAgeAtMaturity && variant.MaxAgeAtMaturity) {
+          // User can only select target ages greater than their current age
+          const minTargetAge = Math.max(variant.MinAgeAtMaturity, Math.ceil(ageAtPurchase) + 1);
+          const maxTargetAge = variant.MaxAgeAtMaturity;
+          
+          for (let targetAge = minTargetAge; targetAge <= maxTargetAge; targetAge++) {
+            // Calculate actual policy term: target age - current age
+            const actualTerm = targetAge - ageAtPurchase;
+            if (actualTerm > 0) {
+              policyTerms.add(actualTerm);
+            }
+          }
         }
-      }
-    });
+      });
+    } else {
+      // For regular policies: use MinPolicyTerm and MaxPolicyTerm, then apply Age at Maturity Rule
+      eligibleVariants.forEach(variant => {
+        const minTerm = this.parsePolicyTerm(variant.MinPolicyTerm);
+        const maxTerm = this.parsePolicyTerm(variant.MaxPolicyTerm);
+        
+        // Apply Age at Maturity Rule
+        let validMinTerm = minTerm;
+        let validMaxTerm = maxTerm;
+        
+        if (variant.MinAgeAtMaturity) {
+          const minTermFromMaturity = variant.MinAgeAtMaturity - ageAtPurchase;
+          validMinTerm = Math.max(minTerm, minTermFromMaturity);
+        }
+        
+        if (variant.MaxAgeAtMaturity) {
+          const maxTermFromMaturity = variant.MaxAgeAtMaturity - ageAtPurchase;
+          validMaxTerm = Math.min(maxTerm, maxTermFromMaturity);
+        }
+        
+        // Only add terms if valid range exists
+        if (validMinTerm <= validMaxTerm) {
+          if (validMinTerm === validMaxTerm) {
+            // Fixed term policy
+            policyTerms.add(validMinTerm);
+          } else {
+            // Range policy - add all terms in range
+            for (let term = validMinTerm; term <= validMaxTerm; term++) {
+              policyTerms.add(term);
+            }
+          }
+        }
+      });
+    }
     
     // Convert to sorted array
     return Array.from(policyTerms).sort((a, b) => a - b);
@@ -344,33 +416,78 @@ class PolicyDataService {
   ): PolicyData | null {
     const allVariants = this.getPoliciesByPlanName(planName);
     
-    // Find variant that matches ALL criteria:
-    // 1. Policy term matches (either exact or within range)
-    // 2. User's age is within variant's age limits
-    // 3. Purchase date is within variant's active period
+    if (allVariants.length === 0) return null;
+
+    // Check if this is an age-linked policy
+    const isAgeLinked = ["512N296V02", "512N312V01", "512N312V02"]
+      .includes(allVariants[0].UIN);
     
-    const matchingVariant = allVariants.find(variant => {
-      // Check if policy term matches
-      const termMatches = policyTerm >= variant.MinPolicyTerm && 
-                         policyTerm <= variant.MaxPolicyTerm;
-      
-      if (!termMatches) return false;
-      
-      // Check age eligibility
-      const minAge = this.parseAge(variant.MinEntryAge);
-      const maxAge = this.parseAge(variant.MaxEntryAge);
-      
-      if (ageAtPurchase < minAge || ageAtPurchase > maxAge) {
-        return false;
-      }
-      
-      // Check date eligibility
-      if (!this.isPolicyActiveOnDate(variant, purchaseDate)) {
-        return false;
-      }
-      
-      return true;
-    });
+    // Find variant that matches ALL criteria
+    let matchingVariant;
+    
+    if (isAgeLinked) {
+      // For age-linked policies, find the variant that exactly matches the user's age
+      // This ensures we get the correct PPT value for the specific age
+      matchingVariant = allVariants.find(variant => {
+        const minAge = this.parseAge(variant.MinEntryAge);
+        const maxAge = this.parseAge(variant.MaxEntryAge);
+        
+        // Check if user's age falls within this variant's age range
+        if (ageAtPurchase < minAge || ageAtPurchase > maxAge) {
+          return false;
+        }
+        
+        // Check date eligibility
+        if (!this.isPolicyActiveOnDate(variant, purchaseDate)) {
+          return false;
+        }
+        
+        // Check if the resulting maturity age is within limits
+        const maturityAge = ageAtPurchase + policyTerm;
+        if (variant.MinAgeAtMaturity && maturityAge < variant.MinAgeAtMaturity) {
+          return false;
+        }
+        if (variant.MaxAgeAtMaturity && maturityAge > variant.MaxAgeAtMaturity) {
+          return false;
+        }
+        
+        return true;
+      });
+    } else {
+      // For regular policies: find variant that matches policy term
+      matchingVariant = allVariants.find(variant => {
+        // Check age eligibility first
+        const minAge = this.parseAge(variant.MinEntryAge);
+        const maxAge = this.parseAge(variant.MaxEntryAge);
+        
+        if (ageAtPurchase < minAge || ageAtPurchase > maxAge) {
+          return false;
+        }
+        
+        // Check date eligibility
+        if (!this.isPolicyActiveOnDate(variant, purchaseDate)) {
+          return false;
+        }
+        
+        // Check if term is within MinPolicyTerm and MaxPolicyTerm
+        const minTerm = this.parsePolicyTerm(variant.MinPolicyTerm);
+        const maxTerm = this.parsePolicyTerm(variant.MaxPolicyTerm);
+        if (policyTerm < minTerm || policyTerm > maxTerm) {
+          return false;
+        }
+        
+        // Also check Age at Maturity Rule
+        const ageAtMaturity = ageAtPurchase + policyTerm;
+        if (variant.MinAgeAtMaturity && ageAtMaturity < variant.MinAgeAtMaturity) {
+          return false;
+        }
+        if (variant.MaxAgeAtMaturity && ageAtMaturity > variant.MaxAgeAtMaturity) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
     
     return matchingVariant || null;
   }
