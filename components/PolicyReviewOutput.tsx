@@ -14,10 +14,14 @@ interface PolicyReviewOutputProps {
 
 export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps) {
   const [selectedTimeframe, setSelectedTimeframe] = useState<'today' | '3years' | '6years' | 'maturity'>('today');
+  const [showCashflow, setShowCashflow] = useState(false);
+  const [showPortfolio, setShowPortfolio] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showContactForm, setShowContactForm] = useState(false);
   
   // Placeholder data - replace with actual calculations
   // TODO: Use formData prop to calculate actual values
-  const naitriScore = 72;
+  const naitriScore = 91;
   const policyPerformance = {
     currentValue: 850000,
     maturityValue: 1200000,
@@ -107,6 +111,29 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
       case 'maturity': return 'At Maturity';
       default: return 'Till Today';
     }
+  };
+
+  // Handler functions for CTA buttons
+  const handleViewCashflow = () => {
+    setShowCashflow(!showCashflow);
+  };
+
+  const handleExplorePortfolio = () => {
+    setShowPortfolio(!showPortfolio);
+  };
+
+  const handleDownloadPDF = () => {
+    setIsGeneratingPDF(true);
+    // Simulate PDF generation
+    setTimeout(() => {
+      setIsGeneratingPDF(false);
+      // In production, this would trigger actual PDF download
+      alert('PDF Report is ready! In production, this would download a detailed PDF report.');
+    }, 2000);
+  };
+
+  const handleNeedHelp = () => {
+    setShowContactForm(!showContactForm);
   };
 
   const renderGraph = () => {
@@ -525,46 +552,192 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               {/* Primary Actions - Most important */}
               <Button 
+                onClick={handleViewCashflow}
                 className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
                 <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
                   <Eye className="h-8 w-8" />
                 </div>
                 <span className="text-base md:text-lg">View Cashflow Comparison</span>
-                <span className="text-xs opacity-80">See detailed year-by-year breakdown</span>
+                <span className="text-xs opacity-80">{showCashflow ? 'Hide details' : 'See detailed year-by-year breakdown'}</span>
               </Button>
               
               <Button 
+                onClick={handleExplorePortfolio}
                 className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
                 <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
                   <PieChart className="h-8 w-8" />
                 </div>
                 <span className="text-base md:text-lg">Explore Naitri Portfolio</span>
-                <span className="text-xs opacity-80">Discover our investment strategy</span>
+                <span className="text-xs opacity-80">{showPortfolio ? 'Hide details' : 'Discover our investment strategy'}</span>
               </Button>
               
               {/* Secondary Actions */}
               <Button 
-                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 disabled:from-gray-400 disabled:to-gray-500 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group disabled:scale-100 disabled:cursor-not-allowed"
               >
                 <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
-                  <Download className="h-8 w-8" />
+                  <Download className={`h-8 w-8 ${isGeneratingPDF ? 'animate-bounce' : ''}`} />
                 </div>
-                <span className="text-base md:text-lg">Download Full Report</span>
-                <span className="text-xs opacity-80">Get PDF with detailed analysis</span>
+                <span className="text-base md:text-lg">{isGeneratingPDF ? 'Generating...' : 'Download Full Report'}</span>
+                <span className="text-xs opacity-80">{isGeneratingPDF ? 'Please wait' : 'Get PDF with detailed analysis'}</span>
               </Button>
               
               <Button 
+                onClick={handleNeedHelp}
                 className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
                 <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
                   <Phone className="h-8 w-8" />
                 </div>
                 <span className="text-base md:text-lg">Need Help to Switch?</span>
-                <span className="text-xs opacity-80">Connect with our experts</span>
+                <span className="text-xs opacity-80">{showContactForm ? 'Hide form' : 'Connect with our experts'}</span>
               </Button>
             </div>
+            
+            {/* Cashflow Comparison Section - Expandable */}
+            {showCashflow && (
+              <div className="mt-6 p-6 bg-white rounded-2xl border-2 border-blue-200 shadow-lg animate-fadeIn">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                  <Eye className="h-6 w-6 text-blue-600" />
+                  <span>Year-by-Year Cashflow Comparison</span>
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-blue-50">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-sm font-bold text-gray-700">Year</th>
+                        <th className="px-4 py-3 text-right text-sm font-bold text-gray-700">Your Policy</th>
+                        <th className="px-4 py-3 text-right text-sm font-bold text-gray-700">Naitri Portfolio</th>
+                        <th className="px-4 py-3 text-right text-sm font-bold text-gray-700">Difference</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {[1, 3, 5, 10, 15, 20].map((year) => {
+                        const policyValue = 600000 * (1 + 0.052) ** year;
+                        const naitriValue = 600000 * (1 + 0.098) ** year;
+                        const difference = naitriValue - policyValue;
+                        return (
+                          <tr key={year} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm font-medium text-gray-900">Year {year}</td>
+                            <td className="px-4 py-3 text-sm text-right text-gray-700">₹{Math.round(policyValue).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-sm text-right text-green-600 font-semibold">₹{Math.round(naitriValue).toLocaleString()}</td>
+                            <td className="px-4 py-3 text-sm text-right text-purple-600 font-semibold">+₹{Math.round(difference).toLocaleString()}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+            
+            {/* Portfolio Details Section - Expandable */}
+            {showPortfolio && (
+              <div className="mt-6 p-6 bg-white rounded-2xl border-2 border-green-200 shadow-lg animate-fadeIn">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                  <PieChart className="h-6 w-6 text-green-600" />
+                  <span>Naitri Portfolio Strategy</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-800">Asset Allocation</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Equity Funds</span>
+                        <span className="font-bold text-green-600">60%</span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div className="h-2 bg-green-600 rounded-full" style={{ width: '60%' }}></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Debt Funds</span>
+                        <span className="font-bold text-blue-600">30%</span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div className="h-2 bg-blue-600 rounded-full" style={{ width: '30%' }}></div>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Gold/Commodities</span>
+                        <span className="font-bold text-yellow-600">10%</span>
+                      </div>
+                      <div className="w-full h-2 bg-gray-200 rounded-full">
+                        <div className="h-2 bg-yellow-600 rounded-full" style={{ width: '10%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-gray-800">Key Features</h4>
+                    <ul className="space-y-2">
+                      <li className="flex items-start space-x-2 text-sm text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Diversified across 15+ mutual funds</span>
+                      </li>
+                      <li className="flex items-start space-x-2 text-sm text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Rebalanced quarterly by experts</span>
+                      </li>
+                      <li className="flex items-start space-x-2 text-sm text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Low expense ratio (avg 0.8%)</span>
+                      </li>
+                      <li className="flex items-start space-x-2 text-sm text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span>Target return: 9-12% annually</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Contact Form Section - Expandable */}
+            {showContactForm && (
+              <div className="mt-6 p-6 bg-white rounded-2xl border-2 border-orange-200 shadow-lg animate-fadeIn">
+                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center space-x-2">
+                  <Phone className="h-6 w-6 text-orange-600" />
+                  <span>Get Expert Assistance</span>
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                    <input
+                      type="text"
+                      placeholder="Enter your name"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <input
+                      type="tel"
+                      placeholder="Enter your phone"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:outline-none"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time to Call</label>
+                    <select className="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:border-orange-500 focus:outline-none">
+                      <option>Morning (9 AM - 12 PM)</option>
+                      <option>Afternoon (12 PM - 4 PM)</option>
+                      <option>Evening (4 PM - 7 PM)</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <Button className="w-full bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white py-4 rounded-xl font-bold">
+                      Request Callback
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
