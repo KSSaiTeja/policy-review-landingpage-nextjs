@@ -109,6 +109,7 @@ export default function PolicyReviewForm({
 }: PolicyReviewFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [formData, setFormData] = useState<{
     step1?: Step1FormValues;
     step2?: Step2FormValues;
@@ -1438,20 +1439,34 @@ export default function PolicyReviewForm({
               <Button
                 onClick={() => {
                   console.log("Final form data:", formData);
-                  // Save data to sessionStorage and navigate to report page
+                  setIsGeneratingReport(true);
+                  
+                  // Save data to sessionStorage
                   sessionStorage.setItem('policyReviewData', JSON.stringify(formData));
                   
-                  // Add smooth transition
+                  // Show loading state then navigate
                   setTimeout(() => {
                     onOpenChange(false);
                     setTimeout(() => {
                       router.push('/policy-review-report');
+                      setIsGeneratingReport(false);
                     }, 100);
-                  }, 200);
+                  }, 1500);
                 }}
-                className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
+                disabled={isGeneratingReport}
+                className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                Generate Policy Review Report
+                {isGeneratingReport ? (
+                  <span className="flex items-center space-x-2">
+                    <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Generating Report...</span>
+                  </span>
+                ) : (
+                  'Generate Policy Review Report'
+                )}
               </Button>
             </div>
           </div>

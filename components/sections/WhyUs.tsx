@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import PolicyReviewForm from "@/components/PolicyReviewForm";
+import Link from "next/link";
 
 const reasons = [
   {
@@ -51,12 +50,9 @@ const reasons = [
 ];
 
 export default function WhyUs() {
-  const [formOpen, setFormOpen] = useState(false);
-
   return (
-    <>
-      <section id="why-us" className="py-20 bg-white relative">
-        <div className="container mx-auto px-4">
+    <section id="why-us" className="py-20 bg-white relative">
+      <div className="container mx-auto px-4">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -116,22 +112,18 @@ export default function WhyUs() {
               </div>
               
               {/* CTA */}
-              <button
-                onClick={() => setFormOpen(true)}
+              <Link
+                href="/review"
                 className="relative inline-block text-[#231f20] text-base no-underline group cursor-pointer bg-transparent border-none p-0"
               >
                 {reason.linkText}
                 <span className="absolute left-0 bottom-0 w-[45%] h-[1px] bg-[#231f20] group-hover:w-full transition-all duration-300"></span>
-              </button>
+              </Link>
             </motion.div>
           ))}
         </div>
       </div>
     </section>
-
-      {/* Policy Review Form Dialog */}
-      <PolicyReviewForm open={formOpen} onOpenChange={setFormOpen} />
-    </>
   );
 }
 

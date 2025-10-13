@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import PolicyReviewForm from "@/components/PolicyReviewForm";
+import Link from "next/link";
 
 export default function Hero() {
-  const [formOpen, setFormOpen] = useState(false);
 
   return (
     <>
@@ -52,12 +50,12 @@ export default function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 1.1 }}
             >
-              <button
-                onClick={() => setFormOpen(true)}
+              <Link
+                href="/review"
                 className="miwlo-btn-pill inline-block cursor-pointer"
               >
                 Review My Policy FREE →
-              </button>
+              </Link>
             </motion.div>
 
             {/* Hero Image */}
@@ -78,9 +76,6 @@ export default function Hero() {
           </div>
         </div>
       </section>
-
-      {/* Policy Review Form Dialog */}
-      <PolicyReviewForm open={formOpen} onOpenChange={setFormOpen} />
     </>
   );
 }

@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import PolicyReviewForm from "@/components/PolicyReviewForm";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
 
   const navItems = [
     { href: "#how-it-works", label: "How It Works" },
@@ -39,12 +37,12 @@ export default function Header() {
                   <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#231f20] transition-all duration-300 group-hover:w-full"></span>
                 </a>
               ))}
-              <button
-                onClick={() => setFormOpen(true)}
+              <Link
+                href="/review"
                 className="miwlo-btn-pill cursor-pointer"
               >
                 Review My Policy - FREE
-              </button>
+              </Link>
             </div>
           </nav>
         </div>
@@ -59,12 +57,12 @@ export default function Header() {
             </Link>
             
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setFormOpen(true)}
-                className="bg-[#231f20] text-white text-sm px-4 py-2 rounded-full hover:bg-transparent hover:text-[#231f20] border-2 border-transparent hover:border-[#231f20] transition-all duration-300 cursor-pointer"
+              <Link
+                href="/review"
+                className="bg-[#231f20] text-white text-sm px-4 py-2 rounded-full hover:bg-transparent hover:text-[#231f20] border-2 border-transparent hover:border-[#231f20] transition-all duration-300 cursor-pointer inline-block"
               >
                 Review FREE
-              </button>
+              </Link>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2"
@@ -95,8 +93,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Policy Review Form Dialog */}
-      <PolicyReviewForm open={formOpen} onOpenChange={setFormOpen} />
     </>
   );
 }
