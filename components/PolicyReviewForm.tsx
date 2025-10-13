@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,7 +10,6 @@ import { CalendarIcon, AlertCircle, CheckCircle2 } from "lucide-react";
 import { useAgeAtPurchase, useAvailablePlansForUser } from "@/lib/hooks/usePolicyData";
 import { policyDataService } from "@/lib/services/PolicyDataService";
 import { SelectField, NumberField } from "@/components/form-fields/FormFieldComponents";
-import PolicyReviewOutput from "@/components/PolicyReviewOutput";
 import {
   Dialog,
   DialogContent,
@@ -107,6 +107,7 @@ export default function PolicyReviewForm({
   open,
   onOpenChange,
 }: PolicyReviewFormProps) {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<{
     step1?: Step1FormValues;
@@ -114,7 +115,7 @@ export default function PolicyReviewForm({
     step3?: Step3FormValues;
     step4?: Step4FormValues;
   }>({});
-  const totalSteps = 6;
+  const totalSteps = 5;
 
   const step1Form = useForm<Step1FormValues>({
     resolver: zodResolver(step1Schema),
@@ -371,12 +372,9 @@ export default function PolicyReviewForm({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className={cn(
-        "max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0",
-        currentStep === 6 ? "sm:max-w-[95vw] w-[95vw]" : "sm:max-w-[600px]"
-      )}>
-        {/* Header Section - Law of Common Region (Hidden on Step 6) */}
-        {currentStep !== 6 && (
+      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0 sm:max-w-[600px]">
+        {/* Header Section - Law of Common Region */}
+        {(
           <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
             <DialogHeader>
               <DialogTitle className="text-3xl font-bold text-[#231f20] mb-3" style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}>
@@ -1440,8 +1438,10 @@ export default function PolicyReviewForm({
               <Button
                 onClick={() => {
                   console.log("Final form data:", formData);
-                  // Move to Step 6 to show the output report
-                  setCurrentStep(6);
+                  // Save data to sessionStorage and navigate to report page
+                  sessionStorage.setItem('policyReviewData', JSON.stringify(formData));
+                  onOpenChange(false);
+                  router.push('/policy-review-report');
                 }}
                 className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
               >
@@ -1451,12 +1451,6 @@ export default function PolicyReviewForm({
           </div>
         )}
 
-        {/* Step 6: Policy Review Output - Full Report */}
-        {currentStep === 6 && (
-          <div className="p-0">
-            <PolicyReviewOutput formData={formData} onClose={handleClose} />
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
