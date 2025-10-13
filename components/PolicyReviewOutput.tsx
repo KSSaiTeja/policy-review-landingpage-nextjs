@@ -111,86 +111,123 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
 
   const renderGraph = () => {
     const data = graphData[selectedTimeframe];
-    const maxValue = Math.max(data.policy.value, data.mutualFunds.value, data.naitriPortfolio.value);
+    const maxReturn = Math.max(data.policy.return, data.mutualFunds.return, data.naitriPortfolio.return);
+    const chartHeight = 280;
     
     return (
-      <div className="space-y-6">
-        {/* Graph Bars */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-xl border-2 border-blue-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-blue-600 rounded"></div>
-              <span className="font-semibold text-gray-800">Your Current Policy</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-48 bg-blue-200 rounded-full h-6 relative">
+      <div className="space-y-8">
+        {/* Bar Chart */}
+        <div className="relative bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-gray-200">
+          {/* Y-axis labels */}
+          <div className="flex items-end justify-center space-x-8 mb-4">
+            {/* Your Policy Bar */}
+            <div className="flex flex-col items-center group">
+              <div className="relative mb-3 transition-all duration-500">
+                <div className="text-center mb-2">
+                  <span className="text-2xl font-bold text-blue-600">{data.policy.return}%</span>
+                  <p className="text-xs text-gray-500 mt-1">IRR</p>
+                </div>
                 <div 
-                  className="bg-blue-600 h-6 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(data.policy.value / maxValue) * 100}%` }}
-                ></div>
+                  className="w-24 bg-gradient-to-t from-blue-600 to-blue-400 rounded-t-lg shadow-lg group-hover:shadow-xl transition-all duration-500 relative overflow-hidden"
+                  style={{ height: `${(data.policy.return / maxReturn) * chartHeight}px` }}
+                >
+                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="font-bold text-blue-600">₹{data.policy.value.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">{data.policy.return}% IRR</p>
+              <div className="text-center mt-3 px-2">
+                <p className="font-semibold text-gray-800 text-sm">Your Current</p>
+                <p className="font-semibold text-gray-800 text-sm">Policy</p>
+              </div>
+            </div>
+
+            {/* Mutual Funds Bar */}
+            <div className="flex flex-col items-center group">
+              <div className="relative mb-3 transition-all duration-500">
+                <div className="text-center mb-2">
+                  <span className="text-2xl font-bold text-green-600">{data.mutualFunds.return}%</span>
+                  <p className="text-xs text-gray-500 mt-1">IRR</p>
+                </div>
+                <div 
+                  className="w-24 bg-gradient-to-t from-green-600 to-green-400 rounded-t-lg shadow-lg group-hover:shadow-xl transition-all duration-500 relative overflow-hidden"
+                  style={{ height: `${(data.mutualFunds.return / maxReturn) * chartHeight}px` }}
+                >
+                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                </div>
+              </div>
+              <div className="text-center mt-3 px-2">
+                <p className="font-semibold text-gray-800 text-sm">Mutual Funds</p>
+                <p className="font-semibold text-gray-800 text-sm">(Average)</p>
+              </div>
+            </div>
+
+            {/* Naitri Portfolio Bar */}
+            <div className="flex flex-col items-center group relative">
+              {/* Best Performer Badge */}
+              <div className="absolute -top-6 -right-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg z-10 flex items-center space-x-1">
+                <Star className="h-3 w-3" />
+                <span>Best</span>
+              </div>
+              <div className="relative mb-3 transition-all duration-500">
+                <div className="text-center mb-2">
+                  <span className="text-2xl font-bold text-purple-600">{data.naitriPortfolio.return}%</span>
+                  <p className="text-xs text-gray-500 mt-1">IRR</p>
+                </div>
+                <div 
+                  className="w-24 bg-gradient-to-t from-purple-600 to-purple-400 rounded-t-lg shadow-lg group-hover:shadow-xl transition-all duration-500 relative overflow-hidden"
+                  style={{ height: `${(data.naitriPortfolio.return / maxReturn) * chartHeight}px` }}
+                >
+                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20 animate-pulse"></div>
+                </div>
+              </div>
+              <div className="text-center mt-3 px-2">
+                <p className="font-semibold text-gray-800 text-sm">Naitri</p>
+                <p className="font-semibold text-gray-800 text-sm">Portfolio</p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl border-2 border-green-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-green-600 rounded"></div>
-              <span className="font-semibold text-gray-800">Mutual Funds (Average)</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-48 bg-green-200 rounded-full h-6 relative">
-                <div 
-                  className="bg-green-600 h-6 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(data.mutualFunds.value / maxValue) * 100}%` }}
-                ></div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-green-600">₹{data.mutualFunds.value.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">{data.mutualFunds.return}% IRR</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-purple-50 rounded-xl border-2 border-purple-200">
-            <div className="flex items-center space-x-3">
-              <div className="w-4 h-4 bg-purple-600 rounded"></div>
-              <span className="font-semibold text-gray-800">Naitri Portfolio</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="w-48 bg-purple-200 rounded-full h-6 relative">
-                <div 
-                  className="bg-purple-600 h-6 rounded-full transition-all duration-500 ease-out"
-                  style={{ width: `${(data.naitriPortfolio.value / maxValue) * 100}%` }}
-                ></div>
-              </div>
-              <div className="text-right">
-                <p className="font-bold text-purple-600">₹{data.naitriPortfolio.value.toLocaleString()}</p>
-                <p className="text-sm text-gray-600">{data.naitriPortfolio.return}% IRR</p>
-              </div>
+          {/* X-axis line */}
+          <div className="w-full h-1 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 rounded-full"></div>
+          
+          {/* Grid lines (subtle) */}
+          <div className="absolute top-8 left-8 right-8 bottom-20 pointer-events-none">
+            <div className="h-full flex flex-col justify-between">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-full border-t border-gray-200 border-dashed"></div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Performance Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600 mb-1">Best Performer</p>
-            <p className="text-lg font-bold text-purple-600">Naitri Portfolio</p>
-            <p className="text-xs text-gray-500">+{data.naitriPortfolio.return - data.policy.return}% vs Policy</p>
+        {/* Key Insights */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="text-center p-5 bg-white rounded-xl border-2 border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-center mb-2">
+              <TrendingUp className="h-5 w-5 text-purple-600 mr-2" />
+              <p className="text-sm font-medium text-gray-600">Performance Gap</p>
+            </div>
+            <p className="text-3xl font-bold text-purple-600">+{(data.naitriPortfolio.return - data.policy.return).toFixed(1)}%</p>
+            <p className="text-xs text-gray-500 mt-1">Naitri vs Your Policy</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600 mb-1">Value Difference</p>
-            <p className="text-lg font-bold text-green-600">₹{(data.naitriPortfolio.value - data.policy.value).toLocaleString()}</p>
-            <p className="text-xs text-gray-500">Additional with Naitri</p>
+          
+          <div className="text-center p-5 bg-white rounded-xl border-2 border-green-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-center mb-2">
+              <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+              <p className="text-sm font-medium text-gray-600">Market Leader</p>
+            </div>
+            <p className="text-3xl font-bold text-green-600">{data.naitriPortfolio.return}%</p>
+            <p className="text-xs text-gray-500 mt-1">Highest Return Rate</p>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-xl">
-            <p className="text-sm text-gray-600 mb-1">Timeframe</p>
-            <p className="text-lg font-bold text-blue-600">{getTimeframeLabel(selectedTimeframe)}</p>
-            <p className="text-xs text-gray-500">Current Analysis</p>
+          
+          <div className="text-center p-5 bg-white rounded-xl border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-center mb-2">
+              <Calculator className="h-5 w-5 text-blue-600 mr-2" />
+              <p className="text-sm font-medium text-gray-600">Analysis Period</p>
+            </div>
+            <p className="text-2xl font-bold text-blue-600">{getTimeframeLabel(selectedTimeframe)}</p>
+            <p className="text-xs text-gray-500 mt-1">Selected Timeframe</p>
           </div>
         </div>
       </div>
@@ -198,104 +235,131 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
+        {/* Header - Law of Proximity & Aesthetic-Usability Effect */}
+        <div className="text-center space-y-4 animate-fadeIn">
           <div className="flex items-center justify-center space-x-3">
-            <div className="p-3 bg-blue-100 rounded-full">
-              <FileText className="h-8 w-8 text-blue-600" />
+            <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl shadow-lg">
+              <FileText className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Policy Review Report</h1>
+            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Policy Review Report
+            </h1>
           </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
             Comprehensive analysis of your LIC policy performance with personalized recommendations
           </p>
+          {/* Visual separator */}
+          <div className="flex items-center justify-center space-x-2 pt-2">
+            <div className="h-1 w-16 bg-gradient-to-r from-transparent to-blue-500 rounded-full"></div>
+            <div className="h-1 w-8 bg-blue-500 rounded-full"></div>
+            <div className="h-1 w-16 bg-gradient-to-l from-transparent to-blue-500 rounded-full"></div>
+          </div>
         </div>
 
-        {/* Naitri Score */}
-        <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardHeader className="text-center pb-4">
-            <CardTitle className="text-2xl font-bold text-gray-900 flex items-center justify-center space-x-3">
-              <Star className="h-8 w-8 text-yellow-500" />
+        {/* Naitri Score - Von Restorff Effect (distinctive visual) */}
+        <Card className="border-2 border-blue-300 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-xl hover:shadow-2xl transition-all duration-300 relative overflow-hidden">
+          {/* Decorative background pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full -translate-y-32 translate-x-32"></div>
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500 rounded-full translate-y-24 -translate-x-24"></div>
+          </div>
+          
+          <CardHeader className="text-center pb-4 relative z-10">
+            <CardTitle className="text-2xl md:text-3xl font-bold text-gray-900 flex items-center justify-center space-x-3">
+              <Star className="h-8 w-8 text-yellow-500 animate-pulse" />
               <span>Naitri Score</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="text-center space-y-6">
-            <div className={`inline-flex items-center space-x-3 px-6 py-4 rounded-2xl border-2 ${getScoreColor(naitriScore)}`}>
+          <CardContent className="text-center space-y-6 relative z-10">
+            <div className={`inline-flex items-center space-x-4 px-8 py-5 rounded-3xl border-2 shadow-lg ${getScoreColor(naitriScore)}`}>
               {getScoreIcon(naitriScore)}
-              <span className="text-4xl font-bold">{naitriScore}/100</span>
+              <span className="text-5xl md:text-6xl font-bold">{naitriScore}<span className="text-3xl text-gray-500">/100</span></span>
             </div>
-            <div className="space-y-2">
-              <Progress value={naitriScore} className="h-3" />
-              <p className="text-sm text-gray-600">
-                {naitriScore >= 80 ? "Excellent Performance" : 
-                 naitriScore >= 60 ? "Good Performance" : "Needs Improvement"}
+            <div className="space-y-3">
+              <Progress value={naitriScore} className="h-4 shadow-inner" />
+              <p className="text-base font-medium text-gray-700">
+                {naitriScore >= 80 ? "🎉 Excellent Performance" : 
+                 naitriScore >= 60 ? "👍 Good Performance" : "💡 Needs Improvement"}
               </p>
             </div>
           </CardContent>
         </Card>
 
-        {/* Policy Performance Summary */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-              <Calculator className="h-6 w-6 text-blue-600" />
+        {/* Policy Performance Summary - Miller's Law & Law of Common Region */}
+        <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-gray-200">
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 flex items-center space-x-3">
+              <div className="p-2 bg-blue-500 rounded-lg">
+                <Calculator className="h-6 w-6 text-white" />
+              </div>
               <span>Policy Performance Summary</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center p-4 bg-blue-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Current Value</p>
-                <p className="text-2xl font-bold text-blue-600">₹{policyPerformance.currentValue.toLocaleString()}</p>
+          <CardContent className="pt-6">
+            {/* Law of Similarity - grouped by color coding */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+              <div className="text-center p-4 md:p-5 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border-2 border-blue-200 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p className="text-xs md:text-sm text-gray-600 mb-2 font-medium">Current Value</p>
+                <p className="text-xl md:text-2xl font-bold text-blue-600 group-hover:text-blue-700">₹{policyPerformance.currentValue.toLocaleString()}</p>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Maturity Value</p>
-                <p className="text-2xl font-bold text-green-600">₹{policyPerformance.maturityValue.toLocaleString()}</p>
+              <div className="text-center p-4 md:p-5 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border-2 border-green-200 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p className="text-xs md:text-sm text-gray-600 mb-2 font-medium">Maturity Value</p>
+                <p className="text-xl md:text-2xl font-bold text-green-600 group-hover:text-green-700">₹{policyPerformance.maturityValue.toLocaleString()}</p>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Total Premium Paid</p>
-                <p className="text-2xl font-bold text-purple-600">₹{policyPerformance.totalPremiumPaid.toLocaleString()}</p>
+              <div className="text-center p-4 md:p-5 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border-2 border-purple-200 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p className="text-xs md:text-sm text-gray-600 mb-2 font-medium">Premium Paid</p>
+                <p className="text-xl md:text-2xl font-bold text-purple-600 group-hover:text-purple-700">₹{policyPerformance.totalPremiumPaid.toLocaleString()}</p>
               </div>
-              <div className="text-center p-4 bg-orange-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Net Gain</p>
-                <p className="text-2xl font-bold text-orange-600">₹{policyPerformance.netGain.toLocaleString()}</p>
+              <div className="text-center p-4 md:p-5 bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl border-2 border-orange-200 hover:scale-105 transition-transform duration-200 cursor-pointer group">
+                <p className="text-xs md:text-sm text-gray-600 mb-2 font-medium">Net Gain</p>
+                <p className="text-xl md:text-2xl font-bold text-orange-600 group-hover:text-orange-700">₹{policyPerformance.netGain.toLocaleString()}</p>
               </div>
             </div>
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Annual Return (XIRR)</p>
-                <p className="text-2xl font-bold text-gray-800">{policyPerformance.annualReturn}%</p>
+            
+            {/* Separator with visual cue */}
+            <div className="my-6 flex items-center">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+              <span className="px-4 text-xs text-gray-500 font-medium">Return Metrics</span>
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="text-center p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-300 hover:border-gray-400 transition-all">
+                <p className="text-sm text-gray-600 mb-2 font-medium">Annual Return (XIRR)</p>
+                <p className="text-3xl md:text-4xl font-bold text-gray-800">{policyPerformance.annualReturn}%</p>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <p className="text-sm text-gray-600 mb-1">Absolute Return</p>
-                <p className="text-2xl font-bold text-gray-800">{policyPerformance.absoluteReturn}%</p>
+              <div className="text-center p-5 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-300 hover:border-gray-400 transition-all">
+                <p className="text-sm text-gray-600 mb-2 font-medium">Absolute Return</p>
+                <p className="text-3xl md:text-4xl font-bold text-gray-800">{policyPerformance.absoluteReturn}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Interactive Comparison of Returns */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900 flex items-center space-x-2">
-              <BarChart3 className="h-6 w-6 text-green-600" />
+        {/* Interactive Comparison of Returns - Hick's Law & Fitts's Law */}
+        <Card className="shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-200">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b border-gray-200">
+            <CardTitle className="text-xl md:text-2xl font-bold text-gray-900 flex items-center space-x-3">
+              <div className="p-2 bg-green-500 rounded-lg">
+                <BarChart3 className="h-6 w-6 text-white" />
+              </div>
               <span>Comparison of Returns (IRR %)</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            {/* Timeframe Selection Buttons */}
-            <div className="flex flex-wrap gap-3 mb-6">
+          <CardContent className="pt-6">
+            {/* Timeframe Selection Buttons - Hick's Law (limited choices) & Fitts's Law (large touch targets) */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
               {(['today', '3years', '6years', 'maturity'] as const).map((timeframe) => (
                 <Button
                   key={timeframe}
                   onClick={() => setSelectedTimeframe(timeframe)}
                   variant={selectedTimeframe === timeframe ? "default" : "outline"}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 ${
+                  className={`px-6 py-4 rounded-2xl font-bold transition-all duration-300 text-sm md:text-base ${
                     selectedTimeframe === timeframe
-                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
-                      : "border-2 border-gray-300 hover:border-blue-400 text-gray-700 hover:text-blue-600"
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-xl scale-105 border-2 border-blue-400"
+                      : "border-2 border-gray-300 hover:border-blue-400 text-gray-700 hover:text-blue-600 hover:shadow-md bg-white"
                   }`}
                 >
                   {getTimeframeLabel(timeframe)}
@@ -448,52 +512,68 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
           </CardContent>
         </Card>
 
-        {/* Call-to-Action Buttons */}
-        <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-          <CardHeader>
-            <CardTitle className="text-xl font-bold text-gray-900 text-center">
+        {/* Call-to-Action Buttons - Serial Position Effect & Fitts's Law */}
+        <Card className="border-2 border-blue-300 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 shadow-xl">
+          <CardHeader className="text-center border-b border-gray-200 pb-4">
+            <CardTitle className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
               Ready to Take Action?
             </CardTitle>
+            <p className="text-sm text-gray-600 mt-2">Choose your next step towards better returns</p>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <CardContent className="pt-6">
+            {/* Pareto Principle - Most important actions first (Serial Position Effect) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {/* Primary Actions - Most important */}
               <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-xl font-semibold flex flex-col items-center space-y-2 h-auto"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
-                <Eye className="h-6 w-6" />
-                <span className="text-sm">View Cashflow Comparison</span>
+                <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  <Eye className="h-8 w-8" />
+                </div>
+                <span className="text-base md:text-lg">View Cashflow Comparison</span>
+                <span className="text-xs opacity-80">See detailed year-by-year breakdown</span>
               </Button>
               
               <Button 
-                className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-xl font-semibold flex flex-col items-center space-y-2 h-auto"
+                className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
-                <PieChart className="h-6 w-6" />
-                <span className="text-sm">Explore Naitri Portfolio</span>
+                <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  <PieChart className="h-8 w-8" />
+                </div>
+                <span className="text-base md:text-lg">Explore Naitri Portfolio</span>
+                <span className="text-xs opacity-80">Discover our investment strategy</span>
+              </Button>
+              
+              {/* Secondary Actions */}
+              <Button 
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
+              >
+                <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  <Download className="h-8 w-8" />
+                </div>
+                <span className="text-base md:text-lg">Download Full Report</span>
+                <span className="text-xs opacity-80">Get PDF with detailed analysis</span>
               </Button>
               
               <Button 
-                className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-xl font-semibold flex flex-col items-center space-y-2 h-auto"
+                className="bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 text-white p-6 md:p-8 rounded-2xl font-bold flex flex-col items-center justify-center space-y-3 h-auto shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 group"
               >
-                <Download className="h-6 w-6" />
-                <span className="text-sm">Download Full Report (PDF)</span>
-              </Button>
-              
-              <Button 
-                className="bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-xl font-semibold flex flex-col items-center space-y-2 h-auto"
-              >
-                <Phone className="h-6 w-6" />
-                <span className="text-sm">Need Help to Switch?</span>
+                <div className="p-3 bg-white/20 rounded-full group-hover:bg-white/30 transition-colors">
+                  <Phone className="h-8 w-8" />
+                </div>
+                <span className="text-base md:text-lg">Need Help to Switch?</span>
+                <span className="text-xs opacity-80">Connect with our experts</span>
               </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Close Button */}
-        <div className="text-center">
+        {/* Close Button - Tesler's Law (simple exit) */}
+        <div className="text-center pt-4">
           <Button 
             onClick={onClose} 
             variant="outline" 
-            className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-3 rounded-xl font-semibold"
+            className="border-2 border-gray-300 hover:border-gray-400 hover:bg-gray-50 text-gray-700 px-10 py-4 rounded-2xl font-semibold text-base shadow-sm hover:shadow transition-all"
           >
             Close Report
           </Button>
