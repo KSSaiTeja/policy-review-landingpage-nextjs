@@ -101,11 +101,13 @@ type Step4FormValues = z.infer<typeof step4Schema>;
 interface PolicyReviewFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  inline?: boolean; // If true, renders directly without Dialog wrapper
 }
 
 export default function PolicyReviewForm({
   open,
   onOpenChange,
+  inline = false,
 }: PolicyReviewFormProps) {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
@@ -371,33 +373,23 @@ export default function PolicyReviewForm({
     return true;
   };
 
-  return (
-    <Dialog open={open} onOpenChange={handleClose} modal={true}>
-      <DialogContent 
-        className="max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0 sm:max-w-[600px]"
-        onPointerDownOutside={(e) => {
-          // Prevent closing on outside click - user should use close button
-          e.preventDefault();
-        }}
-        onEscapeKeyDown={(e) => {
-          // Prevent closing on ESC key
-          e.preventDefault();
-        }}
-      >
-        {/* Header Section - Law of Common Region */}
-        {(
-          <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
-            <DialogHeader>
-              <DialogTitle className="text-3xl font-bold text-[#231f20] mb-3" style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}>
-                Get Your Free Policy Review
-              </DialogTitle>
-              <DialogDescription className="text-base text-gray-600">
-                Let&apos;s analyze your LIC policy and show you the real returns.
-              </DialogDescription>
-            </DialogHeader>
+  const formContent = (
+    <>
+      {/* Header Section - Law of Common Region */}
+      <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
+            {!inline && (
+              <DialogHeader>
+                <DialogTitle className="text-3xl font-bold text-[#231f20] mb-3" style={{ fontFamily: "var(--font-lora), 'Lora', serif" }}>
+                  Get Your Free Policy Review
+                </DialogTitle>
+                <DialogDescription className="text-base text-gray-600">
+                  Let&apos;s analyze your LIC policy and show you the real returns.
+                </DialogDescription>
+              </DialogHeader>
+            )}
 
             {/* Progress Indicator - Visual Feedback (Doherty Threshold) */}
-            <div className="mt-6">
+            <div className={inline ? "" : "mt-6"}>
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-semibold text-[#231f20]">
                   Step {currentStep} of {totalSteps}
@@ -414,7 +406,6 @@ export default function PolicyReviewForm({
               </div>
             </div>
           </div>
-        )}
 
         {/* Step 1: Personal Information - Law of Proximity & Common Region */}
         {currentStep === 1 && (
@@ -550,6 +541,7 @@ export default function PolicyReviewForm({
 
               {/* Form Actions - Law of Common Region (Footer Section) */}
               <div className="flex justify-between gap-3 px-8 py-6 bg-gray-50 border-t border-gray-100">
+              {!inline && (
                 <Button
                   type="button"
                   variant="outline"
@@ -558,6 +550,7 @@ export default function PolicyReviewForm({
                 >
                   Cancel
                 </Button>
+              )}
                 <Button
                   type="submit"
                   disabled={!step1Form.formState.isValid}
@@ -1486,7 +1479,30 @@ export default function PolicyReviewForm({
             </div>
           </div>
         )}
+    </>
+  );
 
+  // Conditional rendering: inline or in Dialog
+  if (inline) {
+    return (
+      <div className="w-full bg-white rounded-2xl shadow-2xl border border-gray-200">
+        {formContent}
+      </div>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose} modal={true}>
+      <DialogContent 
+        className="max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0 sm:max-w-[600px]"
+        onPointerDownOutside={(e) => {
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          e.preventDefault();
+        }}
+      >
+        {formContent}
       </DialogContent>
     </Dialog>
   );

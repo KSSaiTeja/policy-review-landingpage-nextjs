@@ -83,6 +83,7 @@ export default function ReviewPage() {
           <PolicyReviewForm 
             open={isFormOpen} 
             onOpenChange={handleFormClose}
+            inline={true}
           />
         </div>
 
