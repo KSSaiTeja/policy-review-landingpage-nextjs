@@ -1440,8 +1440,14 @@ export default function PolicyReviewForm({
                   console.log("Final form data:", formData);
                   // Save data to sessionStorage and navigate to report page
                   sessionStorage.setItem('policyReviewData', JSON.stringify(formData));
-                  onOpenChange(false);
-                  router.push('/policy-review-report');
+                  
+                  // Add smooth transition
+                  setTimeout(() => {
+                    onOpenChange(false);
+                    setTimeout(() => {
+                      router.push('/policy-review-report');
+                    }, 100);
+                  }, 200);
                 }}
                 className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl"
               >

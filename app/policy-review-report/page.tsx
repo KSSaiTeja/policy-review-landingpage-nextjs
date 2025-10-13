@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Download, TrendingUp, Calculator, FileText, Star, AlertTriangle, CheckCircle, XCircle, BarChart3, PieChart, Eye, Phone, TrendingDown, Minus, ArrowLeft } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
@@ -17,16 +18,26 @@ export default function PolicyReviewReportPage() {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showContactDialog, setShowContactDialog] = useState(false);
   const [formData, setFormData] = useState<unknown>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get form data from sessionStorage
-    const storedData = sessionStorage.getItem('policyReviewData');
-    if (storedData) {
-      setFormData(JSON.parse(storedData));
-    } else {
-      // If no data, redirect back to home
-      router.push('/');
-    }
+    // Simulate loading for smooth transition
+    const loadData = async () => {
+      // Small delay for smooth page transition
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      const storedData = sessionStorage.getItem('policyReviewData');
+      if (storedData) {
+        setFormData(JSON.parse(storedData));
+        // Show skeleton for a bit longer for professional feel
+        await new Promise(resolve => setTimeout(resolve, 800));
+        setIsLoading(false);
+      } else {
+        router.push('/');
+      }
+    };
+    
+    loadData();
   }, [router]);
 
   // Placeholder data - replace with actual calculations from formData
@@ -190,19 +201,112 @@ export default function PolicyReviewReportPage() {
     }, 2000);
   };
 
-  if (!formData) {
+  if (isLoading || !formData) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading your policy review report...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        {/* Skeleton Header */}
+        <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+          <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-4">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-10 w-32" />
+              <div className="flex items-center space-x-3">
+                <Skeleton className="h-10 w-10 rounded-xl" />
+                <Skeleton className="h-8 w-48" />
+              </div>
+              <Skeleton className="h-10 w-40" />
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton Content */}
+        <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8 pb-16">
+          {/* Title Skeleton */}
+          <div className="text-center space-y-4 pt-4">
+            <Skeleton className="h-6 w-96 mx-auto" />
+            <Skeleton className="h-4 w-64 mx-auto" />
+          </div>
+
+          {/* Naitri Score Skeleton */}
+          <Card className="border-2 border-gray-200">
+            <CardHeader className="text-center pb-4">
+              <Skeleton className="h-8 w-48 mx-auto" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col items-center">
+                <Skeleton className="h-48 w-48 rounded-full mb-4" />
+                <Skeleton className="h-12 w-64 rounded-full mb-6" />
+                <div className="grid grid-cols-3 gap-6 w-full max-w-md">
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Performance Summary Skeleton */}
+          <Card className="border-2 border-gray-200">
+            <CardHeader>
+              <Skeleton className="h-8 w-64" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="border-2 border-gray-200 rounded-2xl p-6">
+                <Skeleton className="h-6 w-32 mb-4" />
+                <div className="grid md:grid-cols-3 gap-4 mb-4">
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                  <Skeleton className="h-24 rounded-xl" />
+                </div>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Skeleton className="h-20 rounded-xl" />
+                  <Skeleton className="h-20 rounded-xl" />
+                </div>
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                <Skeleton className="h-64 rounded-xl" />
+                <Skeleton className="h-64 rounded-xl" />
+                <Skeleton className="h-64 rounded-xl" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Chart Skeleton */}
+          <Card className="border-2 border-gray-200">
+            <CardHeader>
+              <Skeleton className="h-8 w-72" />
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-4 gap-3 mb-6">
+                <Skeleton className="h-12 rounded-2xl" />
+                <Skeleton className="h-12 rounded-2xl" />
+                <Skeleton className="h-12 rounded-2xl" />
+                <Skeleton className="h-12 rounded-2xl" />
+              </div>
+              <Skeleton className="h-96 rounded-2xl" />
+            </CardContent>
+          </Card>
+
+          {/* CTA Skeleton */}
+          <Card className="border-2 border-gray-200">
+            <CardHeader>
+              <Skeleton className="h-8 w-48 mx-auto" />
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-40 rounded-2xl" />
+                <Skeleton className="h-40 rounded-2xl" />
+                <Skeleton className="h-40 rounded-2xl" />
+                <Skeleton className="h-40 rounded-2xl" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 animate-fade-in">
       {/* Fixed Header with Back Button */}
       <div className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-4">
@@ -210,7 +314,7 @@ export default function PolicyReviewReportPage() {
             <Button
               onClick={() => router.push('/')}
               variant="outline"
-              className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-xl font-semibold flex items-center space-x-2"
+              className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-2 rounded-xl font-semibold flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>Back to Home</span>
@@ -224,7 +328,7 @@ export default function PolicyReviewReportPage() {
             <Button
               onClick={handleDownloadPDF}
               disabled={isGeneratingPDF}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-xl font-semibold flex items-center space-x-2 disabled:opacity-50"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-2 rounded-xl font-semibold flex items-center space-x-2 disabled:opacity-50 transition-all duration-200"
             >
               <Download className={`h-4 w-4 ${isGeneratingPDF ? 'animate-bounce' : ''}`} />
               <span className="hidden md:inline">{isGeneratingPDF ? 'Generating...' : 'Download PDF'}</span>
@@ -234,7 +338,7 @@ export default function PolicyReviewReportPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8 pb-16">
+      <div className="max-w-6xl mx-auto p-4 md:p-6 lg:p-8 space-y-6 md:space-y-8 pb-16 animate-fade-in">
         
         {/* Page Title */}
         <div className="text-center space-y-4 animate-fade-in pt-4">
@@ -798,13 +902,13 @@ export default function PolicyReviewReportPage() {
 
       {/* Cashflow Comparison Dialog */}
       <Dialog open={showCashflowDialog} onOpenChange={setShowCashflowDialog}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center space-x-2">
               <Eye className="h-6 w-6 text-blue-600" />
               <span>Detailed Cashflow Comparison</span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-600">
               Year-by-year comparison of your policy vs Naitri Portfolio
             </DialogDescription>
           </DialogHeader>
@@ -840,13 +944,13 @@ export default function PolicyReviewReportPage() {
 
       {/* Portfolio Strategy Dialog */}
       <Dialog open={showPortfolioDialog} onOpenChange={setShowPortfolioDialog}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl bg-white">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center space-x-2">
               <PieChart className="h-6 w-6 text-green-600" />
               <span>Naitri Portfolio Strategy</span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-600">
               Diversified investment approach for optimal returns
             </DialogDescription>
           </DialogHeader>
@@ -916,13 +1020,13 @@ export default function PolicyReviewReportPage() {
 
       {/* Contact Form Dialog */}
       <Dialog open={showContactDialog} onOpenChange={setShowContactDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl bg-white">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold flex items-center space-x-2">
               <Phone className="h-6 w-6 text-orange-600" />
               <span>Get Expert Assistance</span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-gray-600">
               Our financial experts will guide you through the switching process
             </DialogDescription>
           </DialogHeader>
