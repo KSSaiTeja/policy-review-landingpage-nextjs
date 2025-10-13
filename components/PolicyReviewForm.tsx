@@ -372,8 +372,18 @@ export default function PolicyReviewForm({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0 sm:max-w-[600px]">
+    <Dialog open={open} onOpenChange={handleClose} modal={true}>
+      <DialogContent 
+        className="max-h-[90vh] overflow-y-auto bg-white shadow-2xl border-0 p-0 sm:max-w-[600px]"
+        onPointerDownOutside={(e) => {
+          // Prevent closing on outside click - user should use close button
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          // Prevent closing on ESC key
+          e.preventDefault();
+        }}
+      >
         {/* Header Section - Law of Common Region */}
         {(
           <div className="bg-white border-b border-gray-100 px-8 pt-8 pb-6">
@@ -1441,17 +1451,22 @@ export default function PolicyReviewForm({
                   console.log("Final form data:", formData);
                   setIsGeneratingReport(true);
                   
-                  // Save data to sessionStorage
-                  sessionStorage.setItem('policyReviewData', JSON.stringify(formData));
-                  
-                  // Show loading state then navigate
-                  setTimeout(() => {
-                    onOpenChange(false);
+                  // Save data to sessionStorage FIRST
+                  try {
+                    const dataToSave = JSON.stringify(formData);
+                    sessionStorage.setItem('policyReviewData', dataToSave);
+                    console.log('Data saved to sessionStorage:', dataToSave);
+                    
+                    // Show loading state then navigate
                     setTimeout(() => {
                       router.push('/policy-review-report');
-                      setIsGeneratingReport(false);
-                    }, 100);
-                  }, 1500);
+                      // Don't close the dialog or reset state here
+                      // The navigation will handle the cleanup
+                    }, 1500);
+                  } catch (error) {
+                    console.error('Error saving to sessionStorage:', error);
+                    setIsGeneratingReport(false);
+                  }
                 }}
                 disabled={isGeneratingReport}
                 className="h-12 px-8 bg-green-600 text-white hover:bg-green-700 rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed"

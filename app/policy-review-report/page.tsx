@@ -27,12 +27,22 @@ export default function PolicyReviewReportPage() {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       const storedData = sessionStorage.getItem('policyReviewData');
-      if (storedData) {
-        setFormData(JSON.parse(storedData));
-        // Show skeleton for a bit longer for professional feel
-        await new Promise(resolve => setTimeout(resolve, 800));
-        setIsLoading(false);
+      console.log('Loading report page, sessionStorage data:', storedData);
+      
+      if (storedData && storedData !== 'undefined' && storedData !== 'null') {
+        try {
+          const parsedData = JSON.parse(storedData);
+          console.log('Parsed form data:', parsedData);
+          setFormData(parsedData);
+          // Show skeleton for a bit longer for professional feel
+          await new Promise(resolve => setTimeout(resolve, 800));
+          setIsLoading(false);
+        } catch (error) {
+          console.error('Error parsing sessionStorage data:', error);
+          router.push('/');
+        }
       } else {
+        console.log('No valid data found, redirecting to home');
         router.push('/');
       }
     };

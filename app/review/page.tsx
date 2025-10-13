@@ -8,12 +8,14 @@ export default function ReviewPage() {
   const router = useRouter();
   const [isFormOpen, setIsFormOpen] = useState(true);
 
-  const handleFormClose = () => {
-    setIsFormOpen(false);
-    // Navigate back to home when form is closed
-    setTimeout(() => {
-      router.push('/');
-    }, 200);
+  const handleFormClose = (open: boolean) => {
+    if (!open) {
+      setIsFormOpen(false);
+      // Navigate back to home when form is explicitly closed
+      setTimeout(() => {
+        router.push('/');
+      }, 200);
+    }
   };
 
   return (
