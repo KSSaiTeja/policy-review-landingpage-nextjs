@@ -1,8 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Linkedin, Star } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Heart, Linkedin } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
 
 const testimonials = [
   {
@@ -101,9 +102,11 @@ export default function Reviews() {
                   {/* Profile */}
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                      <img
+                      <Image
                         src={testimonial.image}
                         alt={testimonial.name}
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -117,7 +120,7 @@ export default function Reviews() {
 
                   {/* Quote */}
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    "{testimonial.quote}"
+                    &ldquo;{testimonial.quote}&rdquo;
                   </p>
                 </div>
               ))}
@@ -138,9 +141,11 @@ export default function Reviews() {
                   {/* Profile */}
                   <div className="flex items-start gap-3 mb-4">
                     <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                      <img
+                      <Image
                         src={testimonial.image}
                         alt={testimonial.name}
+                        width={48}
+                        height={48}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -154,7 +159,7 @@ export default function Reviews() {
 
                   {/* Quote */}
                   <p className="text-sm text-gray-700 leading-relaxed">
-                    "{testimonial.quote}"
+                    &ldquo;{testimonial.quote}&rdquo;
                   </p>
                 </div>
               ))}

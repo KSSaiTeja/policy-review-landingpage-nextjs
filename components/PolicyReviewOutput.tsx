@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, TrendingUp, Calculator, FileText, Star, AlertTriangle, CheckCircle, XCircle, BarChart3, PieChart, Eye, Phone, TrendingDown, Minus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { calculateTotalPremiumPaid, calculatePremiumForTimeframe, formatCurrency, formatDate, type PolicyDetails } from "@/lib/utils/premiumCalculator";
+import { calculateTotalPremiumPaid, calculatePremiumForTimeframe, formatDate, type PolicyDetails } from "@/lib/utils/premiumCalculator";
 
 interface PolicyReviewOutputProps {
-  formData: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  formData: Record<string, Record<string, any>>;
   onClose: () => void;
 }
 

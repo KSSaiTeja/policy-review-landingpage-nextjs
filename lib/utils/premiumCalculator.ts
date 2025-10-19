@@ -33,8 +33,6 @@ export interface TimeframeCalculationResult {
 export function calculateTotalPremiumPaid(policyDetails: PolicyDetails): PremiumCalculationResult {
   const {
     policyStartDate,
-    policyEndDate,
-    policyTerm,
     ppt,
     frequency,
     premiumAmount
@@ -42,7 +40,6 @@ export function calculateTotalPremiumPaid(policyDetails: PolicyDetails): Premium
 
   // Parse dates
   const startDate = new Date(policyStartDate);
-  const endDate = new Date(policyEndDate);
   const currentDate = new Date();
   
   // Calculate premium paying end date

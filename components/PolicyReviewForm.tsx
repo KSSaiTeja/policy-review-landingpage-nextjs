@@ -270,7 +270,7 @@ export default function PolicyReviewForm({
     );
 
     return variant || initialPolicyData;
-  }, [formData.step3?.selectedPolicy, formData.step2?.policyPurchaseDate, currentAgeAtPurchase, step4Form.watch("policyTerm"), initialPolicyData]);
+  }, [formData.step3?.selectedPolicy, formData.step2?.policyPurchaseDate, currentAgeAtPurchase, step4Form, initialPolicyData]);
 
   // Reset dependent fields when policy term changes
   const previousPolicyTerm = useRef<string>("");
@@ -347,7 +347,7 @@ export default function PolicyReviewForm({
 
     // PPT is fixed positive number
     return [{ value: pptValue, label: `${pptValue} years` }];
-  }, [selectedPolicyData, step4Form.watch("policyTerm")]);
+  }, [selectedPolicyData, step4Form]);
 
   // Validate Sum Assured (Rule 1: Between Min/Max and in Multiples)
   const validateSumAssured = (value: string) => {

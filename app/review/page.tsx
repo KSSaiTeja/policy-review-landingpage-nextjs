@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Shield, CheckCircle, FileText } from "lucide-react";
 import PolicyReviewForm from "@/components/PolicyReviewForm";
 
@@ -30,9 +31,11 @@ export default function ReviewPage() {
               <span className="font-semibold">Back to Home</span>
             </Link>
             <div className="flex items-center space-x-3">
-              <img 
+              <Image 
                 src="/logo.png" 
                 alt="PolicyReview" 
+                width={40}
+                height={40}
                 className="h-10 w-auto"
                 onError={(e) => {
                   // Fallback to text if image doesn't exist

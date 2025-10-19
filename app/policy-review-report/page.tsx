@@ -64,7 +64,8 @@ export default function PolicyReviewReportPage() {
     if (!formData) return null;
 
     // Type assertion for formData
-    const data = formData as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = formData as Record<string, Record<string, any>>;
 
     // Convert frequency number to string
     const getFrequencyString = (freq: string | number) => {
@@ -97,7 +98,8 @@ export default function PolicyReviewReportPage() {
     if (!formData) return null;
 
     // Type assertion for formData
-    const data = formData as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const data = formData as Record<string, Record<string, any>>;
 
     // Convert frequency number to string
     const getFrequencyString = (freq: string | number) => {

@@ -1,4 +1,7 @@
 "use client";
+
+import Image from "next/image";
+
 export default function Footer() {
 
 
@@ -20,9 +23,11 @@ export default function Footer() {
             {/* Brand Column */}
             <div className="lg:col-span-1">
               <div className="flex items-center mb-6">
-                <img 
+                <Image 
                   src="/logo.png" 
                   alt="PolicyReview" 
+                  width={40}
+                  height={40}
                   className="h-10 w-auto mr-3"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;

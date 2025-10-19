@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 
@@ -23,9 +24,11 @@ export default function Header() {
           <nav className="flex items-center justify-between h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center">
-              <img 
+              <Image 
                 src="/logo.png" 
                 alt="PolicyReview" 
+                width={40}
+                height={40}
                 className="h-10 w-auto"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -74,9 +77,11 @@ export default function Header() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <Link href="/" className="flex items-center">
-              <img 
+              <Image 
                 src="/logo.png" 
                 alt="PolicyReview" 
+                width={32}
+                height={32}
                 className="h-8 w-auto"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
