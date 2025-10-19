@@ -63,6 +63,9 @@ export default function PolicyReviewReportPage() {
   const premiumCalculation = useMemo(() => {
     if (!formData) return null;
 
+    // Type assertion for formData
+    const data = formData as any;
+
     // Convert frequency number to string
     const getFrequencyString = (freq: string | number) => {
       switch (String(freq)) {
@@ -75,15 +78,15 @@ export default function PolicyReviewReportPage() {
     };
 
     const policyDetails = {
-      policyStartDate: formData.step2?.policyPurchaseDate ? 
-        (formData.step2.policyPurchaseDate instanceof Date ? 
-          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
-          formData.step2.policyPurchaseDate) : '2024-01-01',
-      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
-      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
-      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
-      frequency: getFrequencyString(formData.step4?.premiumFrequency),
-      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+      policyStartDate: data.step2?.policyPurchaseDate ? 
+        (data.step2.policyPurchaseDate instanceof Date ? 
+          data.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          data.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: data.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(data.step4?.policyTerm) || 16,
+      ppt: parseInt(data.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(data.step4?.premiumFrequency) as 'monthly' | 'quarterly' | 'half-yearly' | 'yearly',
+      premiumAmount: parseFloat(data.step4?.premiumAmount) || 3000
     };
 
     return calculateTotalPremiumPaid(policyDetails);
@@ -93,6 +96,9 @@ export default function PolicyReviewReportPage() {
   const timeframeCalculations = useMemo(() => {
     if (!formData) return null;
 
+    // Type assertion for formData
+    const data = formData as any;
+
     // Convert frequency number to string
     const getFrequencyString = (freq: string | number) => {
       switch (String(freq)) {
@@ -105,15 +111,15 @@ export default function PolicyReviewReportPage() {
     };
 
     const policyDetails = {
-      policyStartDate: formData.step2?.policyPurchaseDate ? 
-        (formData.step2.policyPurchaseDate instanceof Date ? 
-          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
-          formData.step2.policyPurchaseDate) : '2024-01-01',
-      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
-      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
-      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
-      frequency: getFrequencyString(formData.step4?.premiumFrequency),
-      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+      policyStartDate: data.step2?.policyPurchaseDate ? 
+        (data.step2.policyPurchaseDate instanceof Date ? 
+          data.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          data.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: data.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(data.step4?.policyTerm) || 16,
+      ppt: parseInt(data.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(data.step4?.premiumFrequency) as 'monthly' | 'quarterly' | 'half-yearly' | 'yearly',
+      premiumAmount: parseFloat(data.step4?.premiumAmount) || 3000
     };
 
     return {
