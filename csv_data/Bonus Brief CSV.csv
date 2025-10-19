@@ -1,0 +1,47 @@
+Sr.No,UIN,Module,Policy Term/Maturity Cal Based on,Surrender Benefit,Maturity/Survival Based on,Bonus Applicable,Bonus Start Time,Bonus Time,Fixed Bonus,Final Addtion Bonus Applicable,Loyalty Addition
+1,512N277V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+2,512N283V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+3,512N297V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+4,512N278V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+5,512N280V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+6,512N284V02,1,Term,Yes,SP,No,NA,NA,NA,No,Yes
+7,512N304V01,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+8,512N304V02,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+9,512N315V01,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,Yes
+10,512N315V02,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,Yes
+11,512N316V01,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,Yes
+12,512N316V02,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,Yes
+13,512N339V01,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,NA
+14,512N339V02,1,Term,Yes,S,Yes,1st Year,PPT,Yes,NA,NA
+15,512N345V01,1,Term,Yes,S,Yes,1st Year,Policy Term,Yes,NA,NA
+16,512N296V02,1,Age,Yes,S ,Yes,1st Year,Policy Term,NA,Yes,NA
+17,512N312V01,1,Age,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+18,512N312V02,1,Age,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+19,512N363V01,1,Both,Yes,S,Yes,1st Year,PPT,Yes,NA,NA
+20,512N313V01,1,Term,Yes,S,No,NA,NA,NA,NA,Yes
+21,512N306V01,1,Term,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+22,512N313V01,1,Term,Yes,S,No,NA,NA,NA,NA,Yes
+23,512N279V02,1,Both,Yes,S,Yes,1st Year,Policy Term,NA,Yes,NA
+24,512N299V01,2,Age,Yes,S ,Yes,1st Year,Policy Term,NA,Yes,NA
+25,512N299V02,2,Age,Yes,S ,Yes,1st Year,Policy Term,NA,Yes,NA
+26,512N365V01,2,Age,Yes,S ,Yes,1st Year,Policy Term,Yes,NA,NA
+27,512N338V01,3,Age,Yes,AP,No,NA,NA,NA,NA,NA
+28,512N338V02,3,Age,Yes,AP,No,NA,NA,NA,NA,NA
+29,512N338V03,3,Age,Yes,AP,No,NA,NA,NA,NA,NA
+30,512N338V04,3,Age,Yes,AP,No,NA,NA,NA,NA,NA
+31,512N338V05,3,Age,Yes,AP,No,NA,NA,NA,NA,NA
+32,512N328V01,4,Age,Option,AP,No,NA,NA,NA,NA,NA
+33,512N328V02,4,Age,Option,AP,No,NA,NA,NA,NA,NA
+34,512N343V01,5,Term,Yes,S,Yes,6th Year,Policy Term,Yes,NA,NA
+35,512N331V01,5,Term,Yes,S,No,NA,NA,NA,NA,Yes
+36,512N349V01,6,Term,Yes,S,Yes,1st Year,Policy Term,Yes,NA,NA
+37,512N362V01,6,Term,Yes,S,Yes,1st Year,Policy Term,Yes,NA,NA
+38,512N362V02,6,Term,Yes,S,Yes,1st Year,Policy Term,Yes,NA,NA
+39,512N234V05,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+40,512N234V06,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+41,512N337V01,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+42,512N337V02,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+43,512N337V03,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+44,512N337V04,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+45,512N337V05,7,Age,Option,AP,No,NA,NA,NA,NA,NA
+46,512N340V01,8,Term,Yes,S,No,NA,NA,NA,NA,Yes

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Download, TrendingUp, Calculator, FileText, Star, AlertTriangle, CheckCircle, XCircle, BarChart3, PieChart, Eye, Phone, TrendingDown, Minus, ArrowLeft } from "lucide-react";
+import { calculateTotalPremiumPaid, calculatePremiumForTimeframe } from "@/lib/utils/premiumCalculator";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export default function PolicyReviewReportPage() {
@@ -58,30 +59,94 @@ export default function PolicyReviewReportPage() {
     risk: 4
   };
 
+  // Dynamic calculation based on form data
+  const premiumCalculation = useMemo(() => {
+    if (!formData) return null;
+
+    // Convert frequency number to string
+    const getFrequencyString = (freq: string | number) => {
+      switch (String(freq)) {
+        case '1': return 'monthly';
+        case '2': return 'quarterly';
+        case '3': return 'half-yearly';
+        case '4': return 'yearly';
+        default: return 'monthly';
+      }
+    };
+
+    const policyDetails = {
+      policyStartDate: formData.step2?.policyPurchaseDate ? 
+        (formData.step2.policyPurchaseDate instanceof Date ? 
+          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          formData.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
+      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(formData.step4?.premiumFrequency),
+      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+    };
+
+    return calculateTotalPremiumPaid(policyDetails);
+  }, [formData]);
+
+  // Calculate premiums for different timeframes
+  const timeframeCalculations = useMemo(() => {
+    if (!formData) return null;
+
+    // Convert frequency number to string
+    const getFrequencyString = (freq: string | number) => {
+      switch (String(freq)) {
+        case '1': return 'monthly';
+        case '2': return 'quarterly';
+        case '3': return 'half-yearly';
+        case '4': return 'yearly';
+        default: return 'monthly';
+      }
+    };
+
+    const policyDetails = {
+      policyStartDate: formData.step2?.policyPurchaseDate ? 
+        (formData.step2.policyPurchaseDate instanceof Date ? 
+          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          formData.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
+      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(formData.step4?.premiumFrequency),
+      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+    };
+
+    return {
+      after3Years: calculatePremiumForTimeframe(policyDetails, '3years'),
+      after6Years: calculatePremiumForTimeframe(policyDetails, '6years'),
+      atMaturity: calculatePremiumForTimeframe(policyDetails, 'maturity')
+    };
+  }, [formData]);
+
   const performanceData = {
     today: {
-      premiumPaid: 120000,
+      premiumPaid: premiumCalculation?.totalPremiumPaid || 0,
       payoutsReceived: 15000,
       currentValue: 98000,
       absoluteReturn: -5.83,
       irr: -2.1
     },
     after3Years: {
-      premiumPaid: 180000,
+      premiumPaid: timeframeCalculations?.after3Years.totalPremiumPaid || 0,
       totalPayouts: 35000,
       expectedValue: 165000,
       absoluteReturn: 11.11,
       irr: 3.2
     },
     after6Years: {
-      premiumPaid: 300000,
+      premiumPaid: timeframeCalculations?.after6Years.totalPremiumPaid || 0,
       totalPayouts: 75000,
       expectedValue: 295000,
       absoluteReturn: 23.33,
       irr: 5.8
     },
     atMaturity: {
-      premiumPaid: 600000,
+      premiumPaid: timeframeCalculations?.atMaturity.totalPremiumPaid || 0,
       totalPayouts: 150000,
       maturityValue: 850000,
       absoluteReturn: 66.67,

@@ -1,26 +1,91 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Download, TrendingUp, Calculator, FileText, Star, AlertTriangle, CheckCircle, XCircle, BarChart3, PieChart, Eye, Phone, TrendingDown, Minus } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
+import { calculateTotalPremiumPaid, calculatePremiumForTimeframe, formatCurrency, formatDate, type PolicyDetails } from "@/lib/utils/premiumCalculator";
 
 interface PolicyReviewOutputProps {
-  formData: unknown;
+  formData: any;
   onClose: () => void;
 }
 
-export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps) {
+export default function PolicyReviewOutput({ formData, onClose }: PolicyReviewOutputProps) {
   const [selectedTimeframe, setSelectedTimeframe] = useState<'today' | '3years' | '6years' | 'maturity'>('today');
   const [showCashflow, setShowCashflow] = useState(false);
   const [showPortfolio, setShowPortfolio] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [showContactForm, setShowContactForm] = useState(false);
   
-  // Placeholder data - replace with actual calculations
-  // TODO: Use formData prop to calculate actual values
+  // Dynamic calculation based on form data
+  const premiumCalculation = useMemo(() => {
+    if (!formData) return null;
+
+
+
+    // Convert frequency number to string
+    const getFrequencyString = (freq: string | number) => {
+      switch (String(freq)) {
+        case '1': return 'monthly';
+        case '2': return 'quarterly';
+        case '3': return 'half-yearly';
+        case '4': return 'yearly';
+        default: return 'monthly';
+      }
+    };
+
+    const policyDetails: PolicyDetails = {
+      policyStartDate: formData.step2?.policyPurchaseDate ? 
+        (formData.step2.policyPurchaseDate instanceof Date ? 
+          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          formData.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
+      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(formData.step4?.premiumFrequency) as 'monthly' | 'quarterly' | 'half-yearly' | 'yearly',
+      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+    };
+
+
+    return calculateTotalPremiumPaid(policyDetails);
+  }, [formData]);
+
+  // Calculate premiums for different timeframes
+  const timeframeCalculations = useMemo(() => {
+    if (!formData) return null;
+
+    // Convert frequency number to string
+    const getFrequencyString = (freq: string | number) => {
+      switch (String(freq)) {
+        case '1': return 'monthly';
+        case '2': return 'quarterly';
+        case '3': return 'half-yearly';
+        case '4': return 'yearly';
+        default: return 'monthly';
+      }
+    };
+
+    const policyDetails: PolicyDetails = {
+      policyStartDate: formData.step2?.policyPurchaseDate ? 
+        (formData.step2.policyPurchaseDate instanceof Date ? 
+          formData.step2.policyPurchaseDate.toISOString().split('T')[0] : 
+          formData.step2.policyPurchaseDate) : '2024-01-01',
+      policyEndDate: formData.step2?.policyEndDate || '2040-01-01',
+      policyTerm: parseInt(formData.step4?.policyTerm) || 16,
+      ppt: parseInt(formData.step4?.premiumPayingTerm) || 10,
+      frequency: getFrequencyString(formData.step4?.premiumFrequency) as 'monthly' | 'quarterly' | 'half-yearly' | 'yearly',
+      premiumAmount: parseFloat(formData.step4?.premiumAmount) || 3000
+    };
+
+    return {
+      after3Years: calculatePremiumForTimeframe(policyDetails, '3years'),
+      after6Years: calculatePremiumForTimeframe(policyDetails, '6years'),
+      atMaturity: calculatePremiumForTimeframe(policyDetails, 'maturity')
+    };
+  }, [formData]);
   
   // 1. Naitri Score (0-5)
   const naitriScore = 3.7;
@@ -33,28 +98,28 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
   // 2. Policy Performance Summary
   const performanceData = {
     today: {
-      premiumPaid: 120000,
+      premiumPaid: premiumCalculation?.totalPremiumPaid || 0,
       payoutsReceived: 15000,
       currentValue: 98000,
       absoluteReturn: -5.83,
       irr: -2.1
     },
     after3Years: {
-      premiumPaid: 180000,
+      premiumPaid: timeframeCalculations?.after3Years.totalPremiumPaid || 0,
       totalPayouts: 35000,
       expectedValue: 165000,
       absoluteReturn: 11.11,
       irr: 3.2
     },
     after6Years: {
-      premiumPaid: 300000,
+      premiumPaid: timeframeCalculations?.after6Years.totalPremiumPaid || 0,
       totalPayouts: 75000,
       expectedValue: 295000,
       absoluteReturn: 23.33,
       irr: 5.8
     },
     atMaturity: {
-      premiumPaid: 600000,
+      premiumPaid: timeframeCalculations?.atMaturity.totalPremiumPaid || 0,
       totalPayouts: 150000,
       maturityValue: 850000,
       absoluteReturn: 66.67,
@@ -327,6 +392,11 @@ export default function PolicyReviewOutput({ onClose }: PolicyReviewOutputProps)
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-blue-200">
                   <div className="text-xs text-gray-600 mb-1 font-medium">Total Premium Paid</div>
                   <div className="text-xl md:text-2xl font-bold text-gray-900">{formatCurrency(performanceData.today.premiumPaid)}</div>
+                  {premiumCalculation && (
+                    <div className="text-xs text-gray-500 mt-1">
+                      {premiumCalculation.premiumsPaidCount} premiums paid • Last paid: {formatDate(premiumCalculation.lastPremiumPaidDate)}
+                    </div>
+                  )}
                 </div>
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-blue-200">
                   <div className="text-xs text-gray-600 mb-1 font-medium">Total Payouts Received</div>
