@@ -1,91 +1,178 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { Heart, Linkedin } from "lucide-react";
+import { useState, useEffect } from "react";
 
-const reviews = [
+const testimonials = [
   {
     name: "Rajesh Kumar",
-    role: "IT Professional, Mumbai",
+    title: "IT Professional",
+    company: "Mumbai",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-    review:
-      "I was shocked to see my LIC policy was giving just 4% returns when FDs were offering 7%. PolicyReview showed me the real numbers. I surrendered and invested in mutual funds - best decision ever!",
+    quote: "I was shocked to see my insurance policy was giving just 4% returns when FDs were offering 7%. PolicyReview showed me the real numbers. I surrendered and invested in mutual funds - best decision ever! Saved ₹2.5 lakhs in 3 years."
   },
   {
     name: "Priya Sharma",
-    role: "Teacher, Bangalore",
+    title: "Teacher",
+    company: "Bangalore",
     image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
-    review:
-      "The AI assistant Naitri helped me understand complex insurance terms. Now I know exactly where my money is going and what returns to expect. Very transparent platform!",
+    quote: "The AI assistant Naitri helped me understand complex insurance terms. Now I know exactly where my money is going and what returns to expect. Very transparent platform! My new portfolio gives 12% vs 5% from my old policy."
   },
   {
     name: "Amit Patel",
-    role: "Business Owner, Delhi",
+    title: "Business Owner",
+    company: "Delhi",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
-    review:
-      "PolicyReview gave me clarity on 3 different LIC policies I had. The comparison with mutual funds was eye-opening. Saved lakhs by making informed decisions.",
+    quote: "PolicyReview gave me clarity on 3 different insurance policies I had. The comparison with mutual funds was eye-opening. Saved lakhs by making informed decisions. My wealth grew by ₹8 lakhs in 2 years after switching."
   },
   {
     name: "Sneha Reddy",
-    role: "Software Engineer, Hyderabad",
+    title: "Software Engineer",
+    company: "Hyderabad",
     image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=150&q=80",
-    review:
-      "Finally, a platform that shows real returns without any hidden agenda. The detailed analysis helped me decide to continue one policy and exit another. Highly recommended!",
+    quote: "Finally, a platform that shows real returns without any hidden agenda. The detailed analysis helped me decide to continue one policy and exit another. Highly recommended! Increased my returns from 5% to 11%."
   },
+  {
+    name: "Vikram Singh",
+    title: "Bank Manager",
+    company: "Pune",
+    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    quote: "As a banker, I thought I knew investments. PolicyReview opened my eyes to how much I was losing with my insurance policy. The switch to mutual funds increased my returns by 300%. Thank you for the transparency!"
+  },
+  {
+    name: "Meera Joshi",
+    title: "CA",
+    company: "Ahmedabad",
+    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=150&q=80",
+    quote: "PolicyReview's detailed return analysis and benchmarking against market alternatives provided the clarity I needed. My clients now get 10-12% returns instead of 4-5% from traditional policies. Game changer!"
+  }
 ];
 
 export default function Reviews() {
-  return (
-    <section id="reviews" className="py-20 bg-white">
-      <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="text-center mb-16"
-        >
-          <p className="section-subheading text-[#797979] mb-3">Customer Success Stories</p>
-          <h3 className="section-heading text-3xl md:text-4xl lg:text-5xl text-[#231f20]">
-            How PolicyReview Helped Indians Make Better Decisions
-          </h3>
-        </motion.div>
+  const [isHovered, setIsHovered] = useState(false);
 
-        {/* Reviews Grid */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {reviews.map((review, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.5 + index * 0.1 }}
-              className="bg-white shadow-[0px_0px_30px_0px_rgba(0,0,0,0.04)] p-8 rounded-[20px] relative"
+  return (
+    <section id="reviews" className="py-24 bg-gray-50">
+      <div className="container mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-sm text-gray-500 uppercase tracking-wider mb-4"
+          >
+            TESTIMONIALS
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-4xl md:text-5xl font-bold text-gray-800 mb-8 flex items-center justify-center gap-3"
+          >
+            Wall of Love <span className="text-[rgb(0,150,138)]">@ PolicyReview</span>
+            <Heart className="w-8 h-8 text-red-500 fill-current" />
+          </motion.h2>
+        </div>
+
+        {/* Single Seamless Testimonials Section */}
+        <div 
+          className="relative overflow-hidden pb-8"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
+          {/* Combined Testimonials with Asymmetric Layout */}
+          <div className="flex flex-col gap-8">
+            {/* Row 1 - Top Row */}
+            <div 
+              className="flex gap-6"
+              style={{
+                animation: isHovered ? 'scrollHorizontal 40s linear infinite paused' : 'scrollHorizontal 40s linear infinite'
+              }}
             >
-              <div className="flex items-start gap-4 mb-4">
-                <div className="relative w-20 h-20 rounded-md overflow-hidden flex-shrink-0">
-                  <Image
-                    src={review.image}
-                    alt={review.name}
-                    fill
-                    className="object-cover"
-                  />
+              {[...testimonials, ...testimonials].map((testimonial, index) => (
+                <div
+                  key={`row1-${testimonial.name}-${index}`}
+                  className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 w-80"
+                >
+                  {/* Profile */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-sm truncate">{testimonial.name}</h4>
+                      <p className="text-xs text-gray-600 truncate">{testimonial.title}</p>
+                      <p className="text-xs text-gray-500 truncate">{testimonial.company}</p>
+                    </div>
+                    <Linkedin className="w-4 h-4 text-[rgb(2,54,125)] flex-shrink-0" />
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    "{testimonial.quote}"
+                  </p>
                 </div>
-                <div className="mt-3">
-                  <h5 className="text-lg font-bold text-[#231f20] mb-0">{review.name}</h5>
-                  <p className="text-sm text-[#77797c] mb-0">{review.role}</p>
+              ))}
+            </div>
+
+            {/* Row 2 - Bottom Row (Offset) */}
+            <div 
+              className="flex gap-6 ml-40"
+              style={{
+                animation: isHovered ? 'scrollHorizontal 45s linear infinite paused' : 'scrollHorizontal 45s linear infinite'
+              }}
+            >
+              {[...testimonials, ...testimonials].map((testimonial, index) => (
+                <div
+                  key={`row2-${testimonial.name}-${index}`}
+                  className="flex-shrink-0 bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-300 w-80"
+                >
+                  {/* Profile */}
+                  <div className="flex items-start gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
+                      <img
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-bold text-gray-800 text-sm truncate">{testimonial.name}</h4>
+                      <p className="text-xs text-gray-600 truncate">{testimonial.title}</p>
+                      <p className="text-xs text-gray-500 truncate">{testimonial.company}</p>
+                    </div>
+                    <Linkedin className="w-4 h-4 text-[rgb(2,54,125)] flex-shrink-0" />
+                  </div>
+
+                  {/* Quote */}
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    "{testimonial.quote}"
+                  </p>
                 </div>
-              </div>
-              
-              <div className="mt-6">
-                <p className="text-[#231f20] font-light mb-0">{review.review}</p>
-              </div>
-            </motion.div>
-          ))}
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes scrollHorizontal {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
     </section>
   );
 }
-

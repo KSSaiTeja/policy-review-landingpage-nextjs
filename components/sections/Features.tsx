@@ -1,111 +1,124 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Image from "next/image";
+import { ArrowRight, TrendingUp, PieChart, Shield } from "lucide-react";
 
-const features = [
+const products = [
   {
-    heading: "Comprehensive Policy Score & Analysis",
-    subheading: "Get a complete picture of your LIC policy performance with our detailed analysis",
-    items: [
-      {
-        title: "Overall Policy Score (out of 5)",
-        description: "Instant rating based on return, liquidity, and safety parameters of your policy",
-      },
-      {
-        title: "Return Timeline Analysis",
-        description: "See your returns till date, 3 years, 6 years, and projected at maturity",
-      },
+    title: "Policy Analysis & Scoring",
+    returns: "Get detailed policy performance analysis",
+    tenure: "Comprehensive review in minutes",
+    examples: [
+      { name: "Overall Policy Score", rate: "0-5 Rating", period: "Instant" },
+      { name: "Return Analysis", rate: "Real vs Expected", period: "Detailed" }
     ],
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
-    imagePosition: "left",
+    icon: TrendingUp,
+    color: "bg-blue-50 border-blue-200"
   },
   {
-    heading: "Smart Comparisons & Actionable Insights",
-    subheading: "Compare your policy with alternative investment options and get clear recommendations",
-    items: [
-      {
-        title: "Benchmark Comparisons",
-        description: "See how your policy stacks against Fixed Deposits, Mutual Funds & Inflation rates",
-      },
-      {
-        title: "AI Assistant - Naitri",
-        description: "Get personalized recommendations from our AI assistant for better financial decisions",
-      },
+    title: "Alternative Comparison",
+    returns: "Compare with better investment options",
+    tenure: "See what you're missing",
+    examples: [
+      { name: "Mutual Funds", rate: "10-15% Returns", amount: "Better than Policy" },
+      { name: "Fixed Deposits", rate: "7-8% Returns", amount: "Guaranteed" }
     ],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-    imagePosition: "right",
+    icon: PieChart,
+    color: "bg-green-50 border-green-200"
   },
+  {
+    title: "Actionable Recommendations",
+    returns: "Clear next steps for your money",
+    tenure: "Continue or switch decision",
+    examples: [
+      { name: "Surrender Analysis", rate: "Break-even Point", period: "Exact Calculation" },
+      { name: "Switch Strategy", rate: "Better Alternatives", period: "Step-by-step" }
+    ],
+    icon: Shield,
+    color: "bg-purple-50 border-purple-200"
+  }
 ];
 
 export default function Features() {
   return (
-    <section id="features" className="py-20 bg-white relative">
-      {features.map((feature, featureIndex) => (
-        <div key={featureIndex} className="relative mb-20 last:mb-0">
-          <div className="container mx-auto px-4">
-            <div className={`flex flex-col ${feature.imagePosition === "left" ? "md:flex-row" : "md:flex-row-reverse"} gap-12 items-center`}>
-              {/* Image */}
-              <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.3 }}
-                className="flex-1 relative"
-              >
-                <div className="relative aspect-video rounded-lg overflow-hidden">
-                  <Image
-                    src={feature.image}
-                    alt={feature.heading}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              </motion.div>
-
-              {/* Content */}
-              <div className="flex-1 space-y-6">
-                <motion.h3
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
-                  className="text-3xl md:text-4xl text-[#231f20]"
-                  style={{ fontFamily: "var(--font-lora), 'Lora', serif", fontWeight: 400 }}
-                >
-                  {feature.heading}
-                </motion.h3>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: 0.4 }}
-                  className="text-[#231f20]"
-                >
-                  {feature.subheading}
-                </motion.p>
-                <ul className="space-y-6 mt-8">
-                  {feature.items.map((item, itemIndex) => (
-                    <motion.li
-                      key={itemIndex}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.5 + itemIndex * 0.1 }}
-                    >
-                      <h4 className="text-xl font-semibold text-[#231f20] mb-2">
-                        {item.title}
-                      </h4>
-                      <p className="text-[#231f20]">{item.description}</p>
-                    </motion.li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
+    <section id="products" className="py-20 bg-white">
+      <div className="container mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-sm text-gray-500 uppercase tracking-wider mb-4"
+          >
+            WHAT WE OFFER?
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="text-4xl md:text-5xl font-bold text-gray-800 mb-8"
+          >
+            Get Better Returns: Compare Your Policy with <span className="text-[rgb(0,150,138)]">Mutual Funds, FDs, and Bonds</span> for up to <span className="text-[rgb(0,150,138)]">14% returns</span>.
+          </motion.h2>
         </div>
-      ))}
+
+        {/* Product Cards */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {products.map((product, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: index * 0.2 }}
+              className={`${product.color} border-2 rounded-2xl p-6 hover:shadow-lg transition-all duration-300`}
+            >
+              {/* Product Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
+                  <product.icon className="w-6 h-6 text-gray-700" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-800">{product.title}</h3>
+              </div>
+
+              {/* Product Details */}
+              <div className="space-y-3 mb-6">
+                <p className="text-sm text-gray-600">{product.returns}</p>
+                <p className="text-sm text-gray-600">{product.tenure}</p>
+              </div>
+
+              {/* Examples */}
+              <div className="space-y-3 mb-6">
+                {product.examples.map((example, exampleIndex) => (
+                  <div key={exampleIndex} className="bg-white rounded-lg p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                      </div>
+                      <div>
+                        <p className="font-medium text-black text-sm">{example.name}</p>
+                        <p className="text-xs text-gray-500">
+                          {example.rate} {example.period && `for ${example.period}`}
+                          {example.amount && `for ${example.amount}`}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <button className="w-full bg-[rgb(2,54,125)] text-white py-3 rounded-lg font-medium hover:bg-[rgb(1,40,95)] transition-all duration-300 flex items-center justify-center gap-2">
+                Learn More
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
-

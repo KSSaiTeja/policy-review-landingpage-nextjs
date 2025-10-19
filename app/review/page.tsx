@@ -30,12 +30,19 @@ export default function ReviewPage() {
               <span className="font-semibold">Back to Home</span>
             </Link>
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl shadow-lg">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="PolicyReview" 
+                className="h-10 w-auto"
+                onError={(e) => {
+                  // Fallback to text if image doesn't exist
+                  e.currentTarget.style.display = 'none';
+                  const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (nextElement) nextElement.style.display = 'block';
+                }}
+              />
               <div className="hidden sm:block">
-                <h1 className="text-xl md:text-2xl font-bold text-gray-900">PolicyReview.co.in</h1>
-                <p className="text-xs text-gray-600">Free LIC Policy Analysis</p>
+                <h1 className="text-xl md:text-2xl font-bold text-gray-900 hidden">PolicyReview.co.in</h1>
               </div>
             </div>
             <div className="w-20 md:w-32"></div>
