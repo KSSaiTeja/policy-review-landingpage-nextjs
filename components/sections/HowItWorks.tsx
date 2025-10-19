@@ -1,143 +1,111 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, PieChart, Smartphone, BarChart, Users } from "lucide-react";
+import { FileText, BarChart3, CheckCircle, ArrowRight } from "lucide-react";
 
-const features = [
+const steps = [
   {
-    title: "Most Insurance Policies Give Only 4-6% Returns",
-    description: "While you could earn 10-15% with better alternatives",
-    visual: (
-      <div className="bg-gray-100 rounded-xl p-4 h-32 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-red-600 mb-1">4-6%</div>
-          <div className="text-sm text-gray-600">Your Insurance Policy</div>
-          <div className="text-xs text-gray-500">Actual Returns</div>
-        </div>
-      </div>
-    ),
-    icon: BarChart3
+    icon: FileText,
+    title: "Enter Your Details",
+    description: "Provide basic policy information - Purchase date, DOB, plan type, premium amount, and policy term",
+    step: "01"
   },
   {
-    title: "Compare Returns: Policy vs Better Options",
-    description: "See how much more you could earn with alternatives",
-    visual: (
-      <div className="bg-gray-100 rounded-xl p-4 h-32 flex items-center justify-center">
-        <div className="space-y-2 w-full">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Insurance Policy</span>
-            <div className="w-12 h-4 bg-red-300 rounded"></div>
-            <span className="text-sm font-medium">5%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Mutual Funds</span>
-            <div className="w-20 h-4 bg-blue-400 rounded"></div>
-            <span className="text-sm font-medium">12%</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Bonds</span>
-            <div className="w-18 h-4 bg-green-400 rounded"></div>
-            <span className="text-sm font-medium">10%</span>
-          </div>
-        </div>
-      </div>
-    ),
-    icon: TrendingUp
+    icon: BarChart3,
+    title: "Get Smart Analysis",
+    description: "Our algorithm analyzes your policy returns, compares with FD, Mutual Funds & Inflation",
+    step: "02"
   },
   {
-    title: "Diversify Your Portfolio for Better Returns",
-    description: "Spread risk across multiple high-return investments",
-    visual: (
-      <div className="bg-gray-100 rounded-xl p-4 h-32 flex items-center justify-center">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xs font-bold">MF</span>
-          </div>
-          <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xs font-bold">FD</span>
-          </div>
-          <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xs font-bold">B</span>
-          </div>
-          <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <span className="text-white text-xs font-bold">S</span>
-          </div>
-        </div>
-      </div>
-    ),
-    icon: PieChart
-  }
+    icon: CheckCircle,
+    title: "Make Informed Decisions",
+    description: "Receive detailed score, return timeline, and actionable insights to maximize your wealth",
+    step: "03"
+  },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="about" className="py-20 bg-white">
-      <div className="container mx-auto px-6">
+    <section id="how-it-works" className="py-24 bg-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, var(--teal-9) 2px, transparent 2px),
+                           radial-gradient(circle at 75% 75%, var(--gray-9) 2px, transparent 2px)`,
+          backgroundSize: '60px 60px'
+        }}></div>
+      </div>
+
+      <div className="container mx-auto px-6 relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-sm text-gray-500 uppercase tracking-wider mb-4"
-          >
-            WHAT IS POLICYREVIEW?
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-4xl md:text-5xl font-bold text-gray-800 mb-8"
-          >
-            Your Insurance Policy vs Better Alternatives: <span className="text-[rgb(0,150,138)]">See the Real Numbers</span>
-          </motion.h2>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-20"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            How It Works
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Simple, transparent, and powerful policy analysis in just three steps
+          </p>
+        </motion.div>
 
-        {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-all duration-300"
-            >
-              {/* Visual */}
-              <div className="mb-4">
-                {feature.visual}
-              </div>
-
-              {/* Content */}
-              <div className="flex items-start gap-3 mb-4">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <feature.icon className="w-5 h-5 text-gray-700" />
+        {/* Steps */}
+        <div className="relative">
+          {/* Connection Line */}
+          <div className="hidden lg:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-teal-200 via-blue-200 to-teal-200"></div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: index * 0.2 }}
+                className="relative text-center group"
+              >
+                {/* Step Number */}
+                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-br from-teal-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm z-10">
+                  {step.step}
                 </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-800 mb-2">{feature.title}</h3>
-                  <p className="text-sm text-gray-600">{feature.description}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
 
-        {/* CTA */}
-        <div className="text-center">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-[rgb(2,54,125)] text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-[rgb(1,40,95)] transition-all duration-300"
-          >
-            Review My Policy FREE
-          </motion.button>
+                {/* Card */}
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 pt-12">
+                  {/* Icon */}
+                  <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <step.icon className="w-10 h-10 text-teal-600" />
+                  </div>
+
+                  {/* Content */}
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Arrow (except for last item) */}
+                {index < steps.length - 1 && (
+                  <div className="hidden lg:block absolute top-24 -right-6 z-10">
+                    <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-500 rounded-full shadow-lg">
+                      <ArrowRight className="w-6 h-6 text-white" />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* Floating Elements */}
+      <div className="absolute top-20 left-20 w-16 h-16 bg-teal-100 rounded-full opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 right-20 w-12 h-12 bg-blue-100 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
     </section>
   );
 }

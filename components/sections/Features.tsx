@@ -1,124 +1,123 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, TrendingUp, PieChart, Shield } from "lucide-react";
+import { CheckCircle, BarChart3, TrendingUp, Brain } from "lucide-react";
 
-const products = [
+const features = [
   {
+    icon: BarChart3,
     title: "Policy Analysis & Scoring",
-    returns: "Get detailed policy performance analysis",
-    tenure: "Comprehensive review in minutes",
-    examples: [
-      { name: "Overall Policy Score", rate: "0-5 Rating", period: "Instant" },
-      { name: "Return Analysis", rate: "Real vs Expected", period: "Detailed" }
-    ],
+    description: "Get comprehensive analysis of your insurance policy with detailed scoring based on returns, liquidity, and safety parameters.",
+    benefits: [
+      "Overall Policy Score (out of 5)",
+      "Return Timeline Analysis",
+      "Risk Assessment",
+      "Liquidity Analysis"
+    ]
+  },
+  {
     icon: TrendingUp,
-    color: "bg-blue-50 border-blue-200"
-  },
-  {
     title: "Alternative Comparison",
-    returns: "Compare with better investment options",
-    tenure: "See what you're missing",
-    examples: [
-      { name: "Mutual Funds", rate: "10-15% Returns", amount: "Better than Policy" },
-      { name: "Fixed Deposits", rate: "7-8% Returns", amount: "Guaranteed" }
-    ],
-    icon: PieChart,
-    color: "bg-green-50 border-green-200"
+    description: "Compare your policy performance against Fixed Deposits, Mutual Funds, and other investment options to make informed decisions.",
+    benefits: [
+      "Benchmark Comparisons",
+      "Return vs Risk Analysis",
+      "Market Performance Tracking",
+      "Alternative Recommendations"
+    ]
   },
   {
+    icon: Brain,
     title: "Actionable Recommendations",
-    returns: "Clear next steps for your money",
-    tenure: "Continue or switch decision",
-    examples: [
-      { name: "Surrender Analysis", rate: "Break-even Point", period: "Exact Calculation" },
-      { name: "Switch Strategy", rate: "Better Alternatives", period: "Step-by-step" }
-    ],
-    icon: Shield,
-    color: "bg-purple-50 border-purple-200"
+    description: "Get personalized recommendations from our AI assistant Naitri for better financial decisions and portfolio optimization.",
+    benefits: [
+      "AI-Powered Insights",
+      "Personalized Strategies",
+      "Action Plans",
+      "Portfolio Optimization"
+    ]
   }
 ];
 
 export default function Features() {
   return (
-    <section id="products" className="py-20 bg-white">
-      <div className="container mx-auto px-6">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-sm text-gray-500 uppercase tracking-wider mb-4"
-          >
-            WHAT WE OFFER?
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-4xl md:text-5xl font-bold text-gray-800 mb-8"
-          >
-            Get Better Returns: Compare Your Policy with <span className="text-[rgb(0,150,138)]">Mutual Funds, FDs, and Bonds</span> for up to <span className="text-[rgb(0,150,138)]">14% returns</span>.
-          </motion.h2>
-        </div>
+    <section id="features" className="py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, var(--teal-9) 2px, transparent 2px),
+                           radial-gradient(circle at 75% 75%, var(--gray-9) 2px, transparent 2px)`,
+          backgroundSize: '60px 60px'
+        }}></div>
+      </div>
 
-        {/* Product Cards */}
-        <div className="grid md:grid-cols-3 gap-8">
-          {products.map((product, index) => (
+      <div className="container mx-auto px-6 relative z-10">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="text-center mb-20"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+            What We Offer
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Comprehensive policy analysis tools designed to help you make informed financial decisions
+          </p>
+        </motion.div>
+
+        {/* Features Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className={`${product.color} border-2 rounded-2xl p-6 hover:shadow-lg transition-all duration-300`}
+              transition={{ duration: 0.8, delay: index * 0.2 }}
+              className="group"
             >
-              {/* Product Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-                  <product.icon className="w-6 h-6 text-gray-700" />
+              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 h-full">
+                {/* Icon */}
+                <div className="w-16 h-16 bg-gradient-to-br from-teal-500 to-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                  <feature.icon className="w-8 h-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-800">{product.title}</h3>
-              </div>
 
-              {/* Product Details */}
-              <div className="space-y-3 mb-6">
-                <p className="text-sm text-gray-600">{product.returns}</p>
-                <p className="text-sm text-gray-600">{product.tenure}</p>
-              </div>
+                {/* Content */}
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  {feature.title}
+                </h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  {feature.description}
+                </p>
 
-              {/* Examples */}
-              <div className="space-y-3 mb-6">
-                {product.examples.map((example, exampleIndex) => (
-                  <div key={exampleIndex} className="bg-white rounded-lg p-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <div className="w-4 h-4 bg-gray-400 rounded"></div>
-                      </div>
-                      <div>
-                        <p className="font-medium text-black text-sm">{example.name}</p>
-                        <p className="text-xs text-gray-500">
-                          {example.rate} {example.period && `for ${example.period}`}
-                          {example.amount && `for ${example.amount}`}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {/* Benefits List */}
+                <ul className="space-y-3">
+                  {feature.benefits.map((benefit, benefitIndex) => (
+                    <motion.li
+                      key={benefitIndex}
+                      initial={{ opacity: 0, x: -20 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.5, delay: (index * 0.2) + (benefitIndex * 0.1) + 0.3 }}
+                      className="flex items-center gap-3"
+                    >
+                      <CheckCircle className="w-5 h-5 text-teal-500 flex-shrink-0" />
+                      <span className="text-gray-700 font-medium">{benefit}</span>
+                    </motion.li>
+                  ))}
+                </ul>
               </div>
-
-              {/* CTA */}
-              <button className="w-full bg-[rgb(2,54,125)] text-white py-3 rounded-lg font-medium hover:bg-[rgb(1,40,95)] transition-all duration-300 flex items-center justify-center gap-2">
-                Learn More
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </motion.div>
           ))}
         </div>
       </div>
+
+      {/* Floating Elements */}
+      <div className="absolute top-20 right-20 w-16 h-16 bg-teal-100 rounded-full opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-20 left-20 w-12 h-12 bg-blue-100 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '1s' }}></div>
     </section>
   );
 }

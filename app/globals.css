@@ -13,6 +13,34 @@
     --accent: 0 0% 96%;
     --accent-foreground: 0 0% 0%;
     --radius: 0.5rem;
+
+    /* New Teal Color Palette */
+    --teal-1: #f9fefe;
+    --teal-2: #f1fbfb;
+    --teal-3: #d9faf9;
+    --teal-4: #c2f5f4;
+    --teal-5: #a9edeb;
+    --teal-6: #8fe1df;
+    --teal-7: #6bd0cf;
+    --teal-8: #14bcbb;
+    --teal-9: #02b8b7;
+    --teal-10: #00acab;
+    --teal-11: #007f7e;
+    --teal-12: #003e3e;
+
+    /* New Gray Color Palette */
+    --gray-1: #f5fdff;
+    --gray-2: #eefbff;
+    --gray-3: #e0f2ff;
+    --gray-4: #d3eaff;
+    --gray-5: #c7e3ff;
+    --gray-6: #bbdbff;
+    --gray-7: #aad1ff;
+    --gray-8: #89bdff;
+    --gray-9: #3d8aff;
+    --gray-10: #377fed;
+    --gray-11: #2561bc;
+    --gray-12: #00165d;
   }
 
   .dark {
@@ -55,6 +83,29 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Enhanced smooth scrolling for all elements */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, var(--teal-9), var(--gray-9));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, var(--teal-10), var(--gray-10));
+}
+
 /* Custom animations */
 @keyframes fadeIn {
   from {
@@ -77,52 +128,61 @@ html {
   animation: fadeIn 0.6s ease-out forwards;
 }
 
-/* Button styles - Corporate Fintech Minimalism */
-.miwlo-btn-pill {
-  padding: 12px 24px;
-  display: inline-block;
-  text-decoration: none;
-  border-radius: 50px;
-  transition: all 0.3s ease-in;
-  background-color: #000000;
-  color: #ffffff;
-  border: 2px solid transparent;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.miwlo-btn-pill:hover {
-  text-decoration: none;
-  background-color: #333333;
-  border: 2px solid #000000;
-  color: #ffffff;
-}
-
-/* PolicyReview-style button variants */
+/* Modern Button Styles */
 .btn-primary {
-  background-color: rgb(0, 150, 138);
+  background-color: var(--teal-9);
   color: #ffffff;
-  border-radius: 50px;
-  padding: 12px 24px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(2, 184, 183, 0.2);
 }
 
 .btn-primary:hover {
-  background-color: rgb(0, 120, 110);
+  background-color: var(--teal-10);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(2, 184, 183, 0.3);
 }
 
 .btn-secondary {
-  background-color: rgb(2, 54, 125);
+  background-color: var(--gray-9);
   color: #ffffff;
-  border-radius: 50px;
-  padding: 12px 24px;
-  font-weight: 500;
-  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(61, 138, 255, 0.2);
 }
 
 .btn-secondary:hover {
-  background-color: rgb(1, 40, 95);
+  background-color: var(--gray-10);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(61, 138, 255, 0.3);
+}
+
+.btn-outline {
+  background-color: transparent;
+  color: var(--teal-9);
+  border: 2px solid var(--teal-9);
+  border-radius: 12px;
+  padding: 14px 30px;
+  font-weight: 600;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background-color: var(--teal-9);
+  color: #ffffff;
+  transform: translateY(-2px);
 }
 
 /* Section headings - Corporate Fintech Minimalism */

@@ -1,139 +1,126 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, Clock, Calendar, Tag } from "lucide-react";
+import { CheckCircle } from "lucide-react";
+import Link from "next/link";
 
-const blogPosts = [
+const reasons = [
   {
-    title: "LIC Policy Returns: The Shocking Truth About Your 4-6% Returns",
-    description: "Discover why most LIC policies give only 4-6% returns and how you can earn 10-15% with better alternatives. Real numbers, real comparisons.",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80",
-    readTime: "5 min read",
-    date: "Dec 15, 2024",
-    category: "Policy Truth",
-    categoryColor: "bg-red-100 text-red-800"
+    title: "100% FREE",
+    subtitle: "₹0",
+    subtitleText: "Forever",
+    description: "No charges, no hidden fees - completely transparent analysis",
+    features: [
+      "Complete Policy Analysis",
+      "Overall Score (out of 5)",
+      "Return Timeline (Till Date, 3yr, 6yr, Maturity)",
+      "FD & MF Comparisons",
+      "Inflation Impact Analysis",
+    ],
+    linkText: "Review Now →",
   },
   {
-    title: "Should You Surrender Your LIC Policy? Complete Guide 2024",
-    description: "Learn when to surrender, when to continue, and how to calculate the exact break-even point for your LIC policy.",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80",
-    readTime: "7 min read",
-    date: "Dec 12, 2024",
-    category: "Policy Guide",
-    categoryColor: "bg-blue-100 text-blue-800"
+    title: "First Movers",
+    subtitle: "No. 1",
+    subtitleText: "Platform",
+    description: "India's first dedicated transparent policy review platform",
+    features: [
+      "Analyzing ~46 LIC Plans (2015-2024)",
+      "AI Assistant - Naitri",
+      "Actionable Recommendations",
+      "Customer-First Approach",
+      "Not Product-Sellers, Solution-Providers",
+    ],
+    linkText: "Try Now →",
   },
   {
-    title: "Mutual Funds vs LIC Policies: Which Gives Better Returns?",
-    description: "Detailed comparison showing why mutual funds consistently outperform LIC policies by 5-10% annually. Real case studies included.",
-    image: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=400&q=80",
-    readTime: "6 min read",
-    date: "Dec 10, 2024",
-    category: "Comparison",
-    categoryColor: "bg-green-100 text-green-800"
-  }
+    title: "Trusted",
+    subtitle: "₹47L Cr",
+    subtitleText: "Market",
+    description: "Helping Indians navigate ₹47 Lakh Crore insurance market",
+    features: [
+      "Unbiased Analysis",
+      "Clear Exit & Continue Scenarios",
+      "Exact Actionable Numbers",
+      "Mission: Financial Awareness",
+      "Building India's Most Trusted Platform",
+    ],
+    linkText: "Get Started →",
+  },
 ];
 
 export default function WhyUs() {
   return (
-    <section id="tools" className="py-20 bg-white">
-      <div className="container mx-auto px-6">
+    <section id="why-us" className="py-20 bg-white relative">
+      <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-sm text-gray-500 uppercase tracking-wider mb-4"
-          >
-            POLICYREVIEW SPEAKS
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-4xl md:text-5xl font-bold text-black mb-8"
-          >
-            Featured Blogs
-          </motion.h2>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="text-center mb-16"
+        >
+          <p className="section-subheading text-[#797979] mb-3">
+            India&apos;s First Transparent Policy Review Platform
+          </p>
+          <h3 className="section-heading text-3xl md:text-4xl lg:text-5xl text-[#231f20]">
+            Why PolicyReview.co.in?
+          </h3>
+        </motion.div>
 
-        {/* Blog Posts Grid */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {blogPosts.map((post, index) => (
-            <motion.article
+        {/* Reasons Grid */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {reasons.map((reason, index) => (
+            <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300"
+              transition={{ duration: 0.6, delay: 0.2 + index * 0.2 }}
+              className="relative bg-white shadow-[0px_10px_22px_2px_rgb(244,244,244)] rounded-[20px] p-10 overflow-hidden"
             >
-              {/* Image */}
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-4 left-4">
-                  <div className="bg-white rounded-lg px-3 py-1 flex items-center gap-2">
-                    <div className="w-4 h-4 bg-black rounded"></div>
-                    <span className="text-xs font-medium text-black">PolicyReview</span>
-                  </div>
-                </div>
+              {/* Plan Name */}
+              <div className="mb-4">
+                <p className="text-lg text-[#231f20] mb-0">{reason.title}</p>
               </div>
-
-              {/* Content */}
-              <div className="p-6">
-                {/* Category */}
-                <div className="mb-3">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${post.categoryColor}`}>
-                    {post.category}
-                  </span>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-lg font-bold text-black mb-3 line-clamp-2">
-                  {post.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                  {post.description}
+              
+              {/* Price */}
+              <div className="mb-4">
+                <p className="text-[#231f20] mb-0">
+                  <span className="text-3xl md:text-4xl font-bold">{reason.subtitle}</span> {reason.subtitleText}
                 </p>
-
-                {/* Meta */}
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      <span>{post.readTime}</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      <span>{post.date}</span>
-                    </div>
-                  </div>
-                </div>
               </div>
-            </motion.article>
+              
+              {/* Description */}
+              <div className="mb-6">
+                <p className="text-[#231f20] mb-0">{reason.description}</p>
+              </div>
+              
+              {/* Features */}
+              <div className="mb-8">
+                <ul className="space-y-3">
+                  {reason.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3 relative pl-8 text-[#231f20]">
+                      <span className="absolute left-0 top-1.5 w-6 h-6 flex items-center justify-center">
+                        <CheckCircle className="w-4 h-4" />
+                      </span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              {/* CTA */}
+              <Link
+                href="/review"
+                className="relative inline-block text-[#231f20] text-base no-underline group cursor-pointer bg-transparent border-none p-0"
+              >
+                {reason.linkText}
+                <span className="absolute left-0 bottom-0 w-[45%] h-[1px] bg-[#231f20] group-hover:w-full transition-all duration-300"></span>
+              </Link>
+            </motion.div>
           ))}
-        </div>
-
-        {/* CTA */}
-        <div className="text-center">
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-black text-white px-8 py-4 rounded-full text-lg font-medium hover:bg-gray-800 transition-all duration-300 inline-flex items-center gap-2"
-          >
-            View All Blogs
-            <ArrowRight className="w-5 h-5" />
-          </motion.button>
         </div>
       </div>
     </section>

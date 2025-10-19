@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, Linkedin } from "lucide-react";
+import { Heart, Linkedin, Star } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const testimonials = [
@@ -53,7 +53,7 @@ export default function Reviews() {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <section id="reviews" className="py-24 bg-gray-50">
+    <section id="reviews" className="py-24 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
       <div className="container mx-auto px-6">
         {/* Section Header */}
         <div className="text-center mb-16">
